@@ -1,63 +1,23 @@
 # L0
 
-An experimental Fault-Tolerant Parser for the experimental L0 language.
-A fragment of the language:
+An experimental Fault-Tolerant Parser for the experimental L0 language,
+featuring a simple yet versatale syntax.  Here is a fragment
+of L0 text
 
-```
-Pythagoras, [i a cool dude indeed], says that $a^2 + b^2 = c^2$.
-Nonetheless, he didn't know about code:
-
-|| code
-factorial n = if n == 0 
-  then 1 
-  else n * (factorial (n - 1))
-
-These days, every high-school student knows that 
-
-$$
-\int_0^1 x^n dx = \frac{1}{n+1}
-
-| indent
-The lack of a trailing "$$" is intentional.
-
-```
-
-The example illustrates the main features: inline elements of
-the form
-
-```
-    [function-name arguments]
-```
-
-Thus `[i foo bar]` gives "foo bar" in italics.
-
-These may be nested, a kind of function composition:
-
-```
-    [i This is [blue blue sky]]
-```
-
-In this example, "This is" is italicized, and "blue sky" is italicized
-and rendered in blue.
-
-Verbatim and code blocks of the form
-
-```
-    | block-name
-    BODY
+    | title
+    About L0
     
-    || verbatim-block-name
-    BODY
-```
+    L0 is an experimental markup language 
+    with a minimal syntax consisting mostly 
+    of [i elements] and [i blocks].
 
-Block names may be followed by arguments, and blocks may be nested
-by indenting them. Thus L0 text is represented by a forest of trees.
 
-There are a few exceptions the general pattern
-of element + block.  Backticks are used for inline code and single
-dollar signs are used for inline math.  As above, an unmatched
-"$$" is used for display math.  That's it.  The idea is to have
-a convenient and versatile yet minimal language.
+See [About L0](https://l0-lab-demo.lamdera.app/p/pu-ca417-qg051)
+for more.  Also, here is a [demo](https://l0-lab-demo.lamdera.app/).  You can sign
+up, create, edit and keep documents with a free account.  You
+can also create documents without out signup.  Good for 
+experimentation, but your work will not be saved
+
 
 ## Parser
 
@@ -89,4 +49,3 @@ has no matching right bracket in red.  The goals in all cases are that
 - Errors be signaled in place in the rendered in a discreet 
 and helpful way.
 
-Here is a [demo](https://l0-lab-demo.lamdera.app/).
