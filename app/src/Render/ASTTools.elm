@@ -1,4 +1,4 @@
-module ASTTools exposing (exprListToStringList, stringValueOfList)
+module Render.ASTTools exposing (exprListToStringList, stringValueOfList)
 
 import Maybe.Extra
 import Parser.Expr exposing (Expr(..))
