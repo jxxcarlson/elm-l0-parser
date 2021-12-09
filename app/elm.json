@@ -3,7 +3,7 @@
     "source-directories": [
         "src",
         "../src",
-         "Render"
+         "render"
     ],
     "elm-version": "0.19.1",
     "dependencies": {
