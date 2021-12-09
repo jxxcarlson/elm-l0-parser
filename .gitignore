@@ -1,0 +1,6 @@
+.idea/
+elm-stuff
+node_modules/
+app/public/Main.js
+stat.txt
+app/Main.js
