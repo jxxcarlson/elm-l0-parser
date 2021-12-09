@@ -4,7 +4,7 @@
     "summary": "Fault-tolerant parser for the L0 markup language",
     "license": "MIT",
     "version": "1.0.0",
-    "exposed-modules": ["L0"],
+    "exposed-modules": ["L0", "Parser.Expr"],
     "elm-version": "0.19.0 <= v < 0.20.0",
     "dependencies": {
         "elm/core": "1.0.0 <= v < 2.0.0",
