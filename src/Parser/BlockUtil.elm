@@ -1,7 +1,7 @@
-module Block.Block exposing (BlockType(..), L0BlockE(..), l0Empty, toBlock, toL0Block, toL0BlockE)
+module Parser.BlockUtil exposing (l0Empty, toBlock, toL0Block, toL0BlockE)
 
 import Either exposing (Either(..))
-import Parser.Expr exposing (Expr)
+import Parser.Block exposing (BlockType(..), L0BlockE(..))
 import Parser.Expression
 import Tree.Blocks exposing (Block)
 
@@ -14,17 +14,6 @@ type L0Block
         , blockType : BlockType
         , content : String
         , children : List L0Block
-        }
-
-
-type L0BlockE
-    = L0BlockE
-        { name : Maybe String
-        , args : List String
-        , indent : Int
-        , blockType : BlockType
-        , content : Either String (List Expr)
-        , children : List L0BlockE
         }
 
 
@@ -123,12 +112,6 @@ toL0Block block =
                 , blockType = blockType
                 , children = []
                 }
-
-
-type BlockType
-    = Paragraph
-    | OrdinaryBlock (List String)
-    | VerbatimBlock (List String)
 
 
 classify : Block -> BlockType
