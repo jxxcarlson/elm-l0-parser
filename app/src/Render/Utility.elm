@@ -1,4 +1,4 @@
-module Utility exposing
+module Render.Utility exposing
     ( elementAttribute
     , keyValueDict
     )
