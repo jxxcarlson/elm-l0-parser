@@ -3,10 +3,11 @@
     "name": "jxxcarlson/elm-l0-parser",
     "summary": "Fault-tolerant parser for the L0 markup language",
     "license": "MIT",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "exposed-modules": [
         "L0",
-        "Parser.Expr", "Parser.Block"
+        "Parser.Expr",
+        "Parser.Block"
     ],
     "elm-version": "0.19.0 <= v < 0.20.0",
     "dependencies": {
