@@ -21,7 +21,7 @@ internalLink str =
 makeId : List Parser.Expr.Expr -> Element.Attribute msg
 makeId exprs =
     elementAttribute "id"
-        (Render.ASTTools.stringValueOfList exprs |> String.trim |> makeSlug |> Debug.log "SLUG")
+        (Render.ASTTools.stringValueOfList exprs |> String.trim |> makeSlug)
 
 
 makeSlug : String -> String
