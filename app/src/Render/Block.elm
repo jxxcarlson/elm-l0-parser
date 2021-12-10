@@ -128,39 +128,13 @@ heading count settings args exprs =
     -- Element.paragraph [ Font.size fontSize ] (renderWithDefault "| heading" count settings exprs)
     Element.link
         [ Font.size fontSize
-        , verticalPadding 22 22
-        , makeId exprs
+        , Render.Utility.makeId exprs
         ]
-        { url = internalLink "TITLE", label = Element.paragraph [] (renderWithDefault "| heading" count settings exprs) }
-
-
-tocLink : String -> List Expr -> Element MarkupMsg
-tocLink label exprList =
-    let
-        t =
-            ASTTools.stringValueOfList exprList
-    in
-    Element.link [] { url = internalLink t, label = Element.text (label ++ " " ++ t) }
+        { url = Render.Utility.internalLink "TITLE", label = Element.paragraph [] (renderWithDefault "| heading" count settings exprs) }
 
 
 verticalPadding top bottom =
     Element.paddingEach { top = top, bottom = bottom, left = 0, right = 0 }
-
-
-makeId : List Expr -> Element.Attribute msg
-makeId exprs =
-    Render.Utility.elementAttribute "id"
-        (ASTTools.stringValueOfList exprs |> String.trim |> makeSlug)
-
-
-internalLink : String -> String
-internalLink str =
-    "#" ++ str |> makeSlug
-
-
-makeSlug : String -> String
-makeSlug str =
-    str |> String.toLower |> String.replace " " "-"
 
 
 renderWithDefault : String -> Int -> Settings -> List Expr -> List (Element MarkupMsg)
