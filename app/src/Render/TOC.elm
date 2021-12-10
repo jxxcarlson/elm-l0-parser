@@ -15,7 +15,7 @@ import Render.Utility
 
 view : Int -> L0.AST -> Element Render.Msg.MarkupMsg
 view counter ast =
-    Element.column [ Element.spacing 8 ]
+    Element.column [ Element.spacing 8, Element.paddingEach { left = 0, right = 0, top = 0, bottom = 36 } ]
         (prepareTOC counter Render.Settings.defaultSettings ast)
 
 
@@ -52,11 +52,14 @@ prepareTOC count settings ast =
             Font.size (round Render.Settings.maxHeadingFontSize)
 
         subtitleSize =
-            Font.size (round (Render.Settings.maxHeadingFontSize / 2))
+            Font.size (round (0.7 * Render.Settings.maxHeadingFontSize))
+
+        idAttr =
+            Render.Utility.elementAttribute "id" "title"
 
         title =
             headings.title
-                |> Maybe.map (List.map (Render.Elm.render count settings) >> Element.paragraph [ titleSize ])
+                |> Maybe.map (List.map (Render.Elm.render count settings) >> Element.paragraph [ titleSize, idAttr ])
                 |> Maybe.withDefault Element.none
 
         subtitle =
@@ -64,14 +67,14 @@ prepareTOC count settings ast =
                 |> Maybe.map (List.map (Render.Elm.render count settings) >> Element.paragraph [ subtitleSize, Font.color (Element.rgb 0.4 0.4 0.4) ])
                 |> Maybe.withDefault Element.none
 
-        space =
-            Element.el [ Element.paddingXY 0 3 ] (Element.text " ")
+        spaceBelow k =
+            Element.el [ Element.paddingEach { bottom = k, top = 0, left = 0, right = 0 } ] (Element.text " ")
     in
     if List.isEmpty toc then
         title :: subtitle :: []
 
     else
-        title :: subtitle :: space :: toc
+        title :: subtitle :: spaceBelow 8 :: toc
 
 
 tocLink : String -> List Expr -> Element MarkupMsg
