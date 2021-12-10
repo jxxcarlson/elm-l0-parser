@@ -83,8 +83,8 @@ blockDict =
     Dict.fromList
         [ ( "indent", indented )
         , ( "heading", heading )
-        , ( "title", title )
-        , ( "subtitle", subtitle )
+        , ( "title", \_ _ _ _ -> Element.none )
+        , ( "subtitle", \_ _ _ _ -> Element.none )
         , ( "item", item )
         ]
 
@@ -95,20 +95,6 @@ verbatimDict =
         [ ( "math", renderDisplayMath )
         , ( "code", renderCode )
         ]
-
-
-title count settings args exprs =
-    Element.paragraph [ Font.size (round Render.Settings.maxHeadingFontSize) ] (renderWithDefault "| heading" count settings exprs)
-
-
-subtitle count settings args exprs =
-    Element.paragraph
-        [ Font.size (Render.Settings.maxHeadingFontSize / sqrt 3 |> round)
-
-        --, Font.italic
-        , Font.color (Element.rgb 0.4 0.4 0.4)
-        ]
-        (renderWithDefault "| heading" count settings exprs)
 
 
 heading count settings args exprs =
