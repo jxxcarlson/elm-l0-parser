@@ -15,22 +15,21 @@ text =
     """
 
 
-
-| heading 1
+| title
 L0 Examples
 
 
 
-| item
-foo bar baz foo bar baz foo bar baz foo bar baz foo bar baz foo bar baz foo bar baz foo bar baz foo bar baz foo bar baz foo bar baz foo bar baz foo bar baz
+
+
 
 
 The examples are illustrative, not exhaustive.
 
-| heading 2
+| heading 1
 Inline constructions
 
-| heading 3
+| heading 2
 Usual markup stuff
 
 I [i thought] that this would be a [b good] idea, but I was [red sadly mistaken!].
@@ -48,17 +47,17 @@ This is code: `a[0] = 1`; so is this: `$stuff$` and `[x]`
 
 
 
-| heading 3
+| heading 2
 Inline math
 
 This is math: $a^2 + b^2 = c^2$
 
 
-| heading 2
+| heading 1
 Block constructions
 
 
-| heading 3
+| heading 2
 Math
 
 [i Display math using pipes:]
@@ -120,10 +119,10 @@ violets are [blue blue]
 
 
 
-| heading 2
+| heading 1
 Handling Errors
 
-| heading 3
+| heading 2
 Inline errors
 
 This line will have an [i incomplete italic element.
@@ -136,8 +135,8 @@ Here is an incomplete math element: $ a^2 + b^2 = c^2 . [i Oops!
 I forgot a closing dollar sign. Bad!!]
 
 
-| heading 3
-Blocks errors
+| heading 2
+Block errors
 
 [i An unknown block name:]
 
@@ -156,6 +155,8 @@ hypotenuse of a right triangle, then $a^2 + b^2 = c^2$.
 |
 Pythagoras said that if $a$, $b$, $c$ are the altitude, base, and
 hypotenuse of a right triangle, then $a^2 + b^2 = c^2$.
+
+
 
 
 

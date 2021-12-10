@@ -6,10 +6,12 @@ import Element exposing (Element)
 import Element.Font as Font
 import Parser.Block exposing (BlockType(..), L0BlockE(..))
 import Parser.Expr exposing (Expr)
+import Render.ASTTools as ASTTools
 import Render.Elm
 import Render.Math exposing (DisplayMode(..))
 import Render.Msg exposing (MarkupMsg)
 import Render.Settings exposing (Settings)
+import Render.Utility
 
 
 render : Int -> Settings -> L0BlockE -> Element MarkupMsg
@@ -123,7 +125,42 @@ heading count settings args exprs =
         fontSize =
             Render.Settings.maxHeadingFontSize / sqrt headingLevel |> round
     in
-    Element.paragraph [ Font.size fontSize ] (renderWithDefault "| heading" count settings exprs)
+    -- Element.paragraph [ Font.size fontSize ] (renderWithDefault "| heading" count settings exprs)
+    Element.link
+        [ Font.size fontSize
+        , verticalPadding 22 22
+        , makeId exprs
+        ]
+        { url = internalLink "TITLE", label = Element.paragraph [] (renderWithDefault "| heading" count settings exprs) }
+
+
+tocLink : String -> List Expr -> Element MarkupMsg
+tocLink label exprList =
+    let
+        t =
+            ASTTools.stringValueOfList exprList
+    in
+    Element.link [] { url = internalLink t, label = Element.text (label ++ " " ++ t) }
+
+
+verticalPadding top bottom =
+    Element.paddingEach { top = top, bottom = bottom, left = 0, right = 0 }
+
+
+makeId : List Expr -> Element.Attribute msg
+makeId exprs =
+    Render.Utility.elementAttribute "id"
+        (ASTTools.stringValueOfList exprs |> String.trim |> makeSlug)
+
+
+internalLink : String -> String
+internalLink str =
+    "#" ++ str |> makeSlug
+
+
+makeSlug : String -> String
+makeSlug str =
+    str |> String.toLower |> String.replace " " "-"
 
 
 renderWithDefault : String -> Int -> Settings -> List Expr -> List (Element MarkupMsg)

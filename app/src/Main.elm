@@ -17,6 +17,7 @@ import Process
 import Render.L0
 import Render.Msg exposing (MarkupMsg)
 import Render.Settings exposing (Settings)
+import Render.TOC
 import Task exposing (Task)
 
 
@@ -31,6 +32,7 @@ main =
 
 type alias Model =
     { sourceText : String
+    , ast : L0.AST
     , count : Int
     , windowHeight : Int
     , windowWidth : Int
@@ -78,6 +80,7 @@ type alias Flags =
 init : Flags -> ( Model, Cmd Msg )
 init flags =
     ( { sourceText = Data.TestDoc.text
+      , ast = L0.parse Data.TestDoc.text
       , count = 0
       , windowHeight = flags.height
       , windowWidth = flags.width
@@ -118,6 +121,7 @@ update msg model =
         InputText str ->
             ( { model
                 | sourceText = str
+                , ast = L0.parse str
                 , count = model.count + 1
               }
             , Cmd.none
@@ -372,7 +376,7 @@ renderedText model =
         , htmlId "__RENDERED_TEXT__"
         , Background.color (Element.rgb255 255 255 255)
         ]
-        (render model.sourceText model.count)
+        ((Render.TOC.view model.count model.ast |> Element.map Render) :: render model.ast model.count)
 
 
 render1 : String -> Int -> List (Element Msg)
@@ -382,10 +386,9 @@ render1 sourceText count =
         |> List.map (Element.map Render)
 
 
-render : String -> Int -> List (Element Msg)
-render sourceText count =
-    sourceText
-        |> Render.L0.renderFromString count defaultSettings
+render : L0.AST -> Int -> List (Element Msg)
+render ast count =
+    Render.L0.renderFromAST count defaultSettings ast
         |> List.map (Element.map Render)
 
 

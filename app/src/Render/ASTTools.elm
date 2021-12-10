@@ -1,17 +1,18 @@
 module Render.ASTTools exposing (exprListToStringList, filterBlocksByArgs, stringValueOfList, tableOfContents)
 
+import L0
 import Maybe.Extra
 import Parser.Block exposing (BlockType(..), L0BlockE(..))
 import Parser.Expr exposing (Expr(..))
 import Tree
 
 
-tableOfContents : List (Tree.Tree L0BlockE) -> List L0BlockE
+tableOfContents : L0.AST -> List L0BlockE
 tableOfContents ast =
     filterBlocksByArgs "heading" ast
 
 
-filterBlocksByArgs : String -> List (Tree.Tree L0BlockE) -> List L0BlockE
+filterBlocksByArgs : String -> L0.AST -> List L0BlockE
 filterBlocksByArgs key ast =
     ast
         |> List.map Tree.flatten

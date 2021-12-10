@@ -6,4 +6,4 @@
 
      live:  npx elm-live src/Main.elm -- --output Main.js
 
-     loc: cloc --by-file src
+     loc: cloc --by-file src/Render
