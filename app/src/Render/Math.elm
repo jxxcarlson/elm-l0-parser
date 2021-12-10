@@ -18,7 +18,7 @@ mathText generation id displayMode content =
     -- is needed because for some reason "\\\\" gets expanded to "\\ \\"
     -- TODO Track this down at the source.
     Html.Keyed.node "span"
-        [ HA.style "margin-left" "6px", HA.style "padding-top" "14px", HA.style "padding-bottom" "14px", HA.id id ]
+        [ HA.style "margin-left" "6px", HA.style "padding-top" "14px", HA.style "padding-bottom" "14px", HA.id id, HA.style "width" "500px" ]
         [ -- ( String.fromInt generation, mathText_ displayMode "ID" (content |> String.replace "\\ \\" "\\\\") )
           ( String.fromInt generation, mathText_ displayMode "ID" content )
         ]
