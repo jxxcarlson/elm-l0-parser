@@ -141,7 +141,11 @@ indented count settings args exprs =
 
 
 renderDisplayMath count settings args str =
-    Render.Math.mathText count "id" DisplayMathMode str
+    let
+        w =
+            String.fromInt settings.width ++ "px"
+    in
+    Render.Math.mathText count w "id" DisplayMathMode str
 
 
 renderCode count settings args str =
