@@ -19,7 +19,7 @@ type alias Settings =
     }
 
 
-defaultSettings : Settings
+defaultSe   ttings : Settings
 defaultSettings =
     { width = 500
     , titleSize = 30
