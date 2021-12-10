@@ -2,6 +2,7 @@ module Render.Settings exposing
     ( Settings
     , defaultSettings
     , leftIndentation
+    , makeSettings
     , maxHeadingFontSize
     , redColor
     )
@@ -21,7 +22,12 @@ type alias Settings =
 
 defaultSettings : Settings
 defaultSettings =
-    { width = 500
+    makeSettings 600
+
+
+makeSettings : Int -> Settings
+makeSettings width =
+    { width = width
     , titleSize = 30
     , paragraphSpacing = 28
     , showTOC = True

@@ -376,7 +376,7 @@ renderedText model =
         , htmlId "__RENDERED_TEXT__"
         , Background.color (Element.rgb255 255 255 255)
         ]
-        ((Render.TOC.view model.count model.ast |> Element.map Render) :: render model.ast model.count)
+        ((Render.TOC.view model.count Render.Settings.defaultSettings model.ast |> Element.map Render) :: render model.ast model.count)
 
 
 render1 : String -> Int -> List (Element Msg)
