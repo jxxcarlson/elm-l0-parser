@@ -5,6 +5,7 @@ module Render.Settings exposing
     , makeSettings
     , maxHeadingFontSize
     , redColor
+    , windowWidthScale
     )
 
 import Element
@@ -22,18 +23,22 @@ type alias Settings =
 
 defaultSettings : Settings
 defaultSettings =
-    makeSettings 600
+    makeSettings 1 600
 
 
-makeSettings : Int -> Settings
-makeSettings width =
-    { width = width
+makeSettings : Float -> Int -> Settings
+makeSettings scale width =
+    { width = round (scale * toFloat width)
     , titleSize = 30
     , paragraphSpacing = 28
     , showTOC = True
     , showErrorMessages = False
     , selectedId = ""
     }
+
+
+windowWidthScale =
+    0.3
 
 
 maxHeadingFontSize : Float
