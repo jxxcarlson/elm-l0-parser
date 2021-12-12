@@ -67,7 +67,7 @@ updateAccumulator ((L0BlockE { blockType, content }) as block) accumulator =
         OrdinaryBlock [ "heading", level ] ->
             let
                 headingIndex =
-                    Vector.increment (String.toInt level |> Maybe.withDefault 0 |> (\x -> x - 1)) accumulator.headingIndex |> Debug.log "VECTOR"
+                    Vector.increment (String.toInt level |> Maybe.withDefault 0 |> (\x -> x - 1)) accumulator.headingIndex
             in
             { accumulator | headingIndex = headingIndex }
 
