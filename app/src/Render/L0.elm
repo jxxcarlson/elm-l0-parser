@@ -27,7 +27,6 @@ render_ ast =
 renderFromAST : Int -> Settings -> AST -> List (Element MarkupMsg)
 renderFromAST count settings ast =
     ast
-        |> Accumulator.transformAST
         |> List.map (Tree.map (Render.Block.render count settings))
         |> List.map unravel
 
