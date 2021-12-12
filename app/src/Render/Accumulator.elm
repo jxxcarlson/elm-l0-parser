@@ -1,29 +1,50 @@
 module Render.Accumulator exposing
     ( Accumulator
     , init
+    , make
     )
 
 import Dict exposing (Dict)
+import L0
 import Parser.Block exposing (BlockType(..), L0BlockE(..))
 import Render.Vector as Vector exposing (Vector)
 import String.Extra
+import Tree exposing (Tree)
 
 
 type alias Accumulator =
-    { sectionIndex : Vector
-    , theoremIndex : Vector
-    , equationIndex : Vector
-    , crossReferences : Dict String String
+    { headingIndex : Vector
     }
 
 
 init : Int -> Accumulator
 init k =
-    { sectionIndex = Vector.init k
-    , theoremIndex = Vector.init 1
-    , equationIndex = Vector.init 1
-    , crossReferences = Dict.empty
+    { headingIndex = Vector.init k
     }
+
+
+make : L0.AST -> Accumulator
+make ast =
+    List.foldl updateTree (init 4) ast
+
+
+updateTree : Tree Parser.Block.L0BlockE -> Accumulator -> Accumulator
+updateTree tree acc =
+    Tree.foldl folder acc tree
+
+
+folder : Parser.Block.L0BlockE -> Accumulator -> Accumulator
+folder (L0BlockE { blockType, content }) accumulator =
+    case blockType of
+        OrdinaryBlock [ "heading", level ] ->
+            let
+                headingIndex =
+                    Vector.increment (String.toInt level |> Maybe.withDefault 0 |> (\x -> x - 1)) accumulator.headingIndex
+            in
+            { accumulator | headingIndex = headingIndex }
+
+        _ ->
+            accumulator
 
 
 
