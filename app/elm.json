@@ -2,8 +2,7 @@
     "type": "application",
     "source-directories": [
         "src",
-        "../src",
-         "render"
+        "../src"
     ],
     "elm-version": "0.19.1",
     "dependencies": {
@@ -19,7 +18,7 @@
             "elm-community/maybe-extra": "5.2.1",
             "elm-community/result-extra": "2.4.0",
             "elm-community/string-extra": "4.0.1",
-            "jxxcarlson/elm-tree-builder": "5.0.0",
+            "jxxcarlson/elm-tree-builder": "6.0.1",
             "mdgriffith/elm-ui": "1.1.8",
             "rtfeldman/console-print": "1.0.1",
             "toastal/either": "3.6.3",

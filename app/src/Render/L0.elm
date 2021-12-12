@@ -2,6 +2,7 @@ module Render.L0 exposing (renderFromAST, renderFromString, render_)
 
 import Element exposing (Element)
 import L0 exposing (AST)
+import Render.Accumulator as Accumulator exposing (Accumulator)
 import Render.Block
 import Render.Msg exposing (MarkupMsg)
 import Render.Settings exposing (Settings)
@@ -26,6 +27,7 @@ render_ ast =
 renderFromAST : Int -> Settings -> AST -> List (Element MarkupMsg)
 renderFromAST count settings ast =
     ast
+        |> Accumulator.transformAST
         |> List.map (Tree.map (Render.Block.render count settings))
         |> List.map unravel
 
