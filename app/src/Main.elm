@@ -39,7 +39,7 @@ type alias Model =
     , windowWidth : Int
     , viewMode : ViewMode
     , message : String
-    , lineNumber : Int
+    , linenumber : Int
     , searchText : String
     , searchCount : Int
     , selectedId : String
@@ -87,7 +87,7 @@ init flags =
       , windowWidth = flags.width
       , viewMode = StandardView
       , message = ""
-      , lineNumber = 0
+      , linenumber = 0
       , searchText = ""
       , searchCount = 0
       , selectedId = "(none)"
@@ -149,6 +149,9 @@ update msg model =
             case msg_ of
                 Render.Msg.SendMeta m ->
                     ( model, Cmd.none )
+
+                Render.Msg.SendLineNumber k ->
+                    ( { model | message = "Line " ++ String.fromInt (k + 2) }, Cmd.none )
 
                 _ ->
                     ( model, Cmd.none )
@@ -300,7 +303,7 @@ editor_ model =
                 [ HtmlAttr.attribute "theme" "twilight"
                 , HtmlAttr.attribute "wrapmode" "true"
                 , HtmlAttr.attribute "tabsize" "2"
-                , HtmlAttr.attribute "linenumber" (String.fromInt (model.lineNumber + 1))
+                , HtmlAttr.attribute "linenumber" (String.fromInt (model.linenumber + 1))
                 , HtmlAttr.attribute "softtabs" "true"
                 , HtmlAttr.attribute "navigateWithinSoftTabs" "true"
                 , HtmlAttr.attribute "fontsize" "12"

@@ -200,6 +200,7 @@ window.customElements.define("ace-editor", class AceEditor extends HTMLElement {
         }
         switch (attr) {
             case "linenumber":
+               console.log(attr)
                this.editor.scrollToLine(newVal, true, true, function () {});
                this.editor.gotoLine(newVal, 0, true);
                break
