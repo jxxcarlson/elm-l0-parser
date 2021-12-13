@@ -29,7 +29,6 @@ viewTocItem count settings (L0BlockE { args, content, lineNumber }) =
         Right exprs ->
             let
                 t =
-                    --Render.ASTTools.stringValueOfList exprs
                     String.fromInt lineNumber
 
                 sectionNumber =
@@ -41,7 +40,6 @@ viewTocItem count settings (L0BlockE { args, content, lineNumber }) =
                 label =
                     Element.paragraph [ tocIndent args ] (sectionNumber :: List.map (Render.Elm.render count settings) exprs)
             in
-            -- Element.paragraph [ tocIndent args ] (List.map (Render.Elm.render count settings) exprs)
             Element.link [ Font.color (Element.rgb 0 0 0.8) ] { url = Render.Utility.internalLink t, label = label }
 
 
