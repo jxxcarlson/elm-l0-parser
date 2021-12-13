@@ -21,7 +21,7 @@ view counter settings ast =
 
 
 viewTocItem : Int -> Render.Settings.Settings -> L0BlockE -> Element Render.Msg.MarkupMsg
-viewTocItem count settings (L0BlockE { args, content }) =
+viewTocItem count settings (L0BlockE { args, content, lineNumber }) =
     case content of
         Left _ ->
             Element.none
@@ -29,7 +29,8 @@ viewTocItem count settings (L0BlockE { args, content }) =
         Right exprs ->
             let
                 t =
-                    Render.ASTTools.stringValueOfList exprs
+                    --Render.ASTTools.stringValueOfList exprs
+                    String.fromInt lineNumber
 
                 sectionNumber =
                     List.Extra.getAt 1 args
