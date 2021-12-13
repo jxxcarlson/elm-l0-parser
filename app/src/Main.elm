@@ -150,8 +150,8 @@ update msg model =
                 Render.Msg.SendMeta m ->
                     ( model, Cmd.none )
 
-                Render.Msg.SendLineNumber k ->
-                    ( { model | message = "Line " ++ String.fromInt (k + 2) }, Cmd.none )
+                Render.Msg.SendId id ->
+                    ( { model | message = "Line " ++ id }, Cmd.none )
 
                 _ ->
                     ( model, Cmd.none )
