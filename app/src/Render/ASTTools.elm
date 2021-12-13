@@ -3,7 +3,7 @@ module Render.ASTTools exposing
     , filterBlocksByArgs
     , getExprsByName
     , getText
-    , matchingIdInAST
+    , matchingIdsInAST
     , stringValueOfList
     , tableOfContents
     , title
@@ -36,8 +36,8 @@ matchExpr name expr =
             False
 
 
-matchingIdInAST : String -> AST -> List String
-matchingIdInAST key ast =
+matchingIdsInAST : String -> AST -> List String
+matchingIdsInAST key ast =
     ast |> List.map Tree.flatten |> List.concat |> List.filterMap (idOfMatchingBlockContent key)
 
 
