@@ -319,6 +319,14 @@ recoverFromError state =
                     , tokenIndex = meta.index + 1
                 }
 
+        (LB _) :: (W " " meta) :: rest ->
+            Loop
+                { state
+                    | committed = errorMessage "[! - delete space after left bracket " :: state.committed
+                    , stack = []
+                    , tokenIndex = meta.index + 1
+                }
+
         (LB _) :: [] ->
             Done
                 { state
