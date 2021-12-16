@@ -295,6 +295,7 @@ isReducible tokens =
 recoverFromError : State -> Step State State
 recoverFromError state =
     case List.reverse state.stack of
+        -- brackets with no intervening text
         (LB _) :: (RB meta) :: rest ->
             Loop
                 { state
@@ -303,6 +304,7 @@ recoverFromError state =
                     , tokenIndex = meta.index + 1
                 }
 
+        -- consecutive left brackets
         (LB _) :: (LB meta) :: rest ->
             Loop
                 { state
@@ -311,6 +313,7 @@ recoverFromError state =
                     , tokenIndex = meta.index
                 }
 
+        -- missing right bracket
         (LB _) :: (S fName meta) :: rest ->
             Loop
                 { state
@@ -319,14 +322,16 @@ recoverFromError state =
                     , tokenIndex = meta.index + 1
                 }
 
+        -- space after left bracket
         (LB _) :: (W " " meta) :: rest ->
             Loop
                 { state
-                    | committed = errorMessage "[! - delete space after left bracket " :: state.committed
+                    | committed = errorMessage "[ - delete space after this bracket " :: state.committed
                     , stack = []
                     , tokenIndex = meta.index + 1
                 }
 
+        -- left bracket with nothing after it.
         (LB _) :: [] ->
             Done
                 { state
@@ -336,14 +341,16 @@ recoverFromError state =
                     , numberOfTokens = 0
                 }
 
+        -- extra right bracket
         (RB meta) :: rest ->
             Loop
                 { state
-                    | committed = errorMessage "]?" :: state.committed
+                    | committed = errorMessage " extra ]?" :: state.committed
                     , stack = []
                     , tokenIndex = meta.index + 1
                 }
 
+        -- dollar sign with no closing dollar sign
         (MathToken meta) :: rest ->
             let
                 content =
@@ -364,6 +371,7 @@ recoverFromError state =
                     , numberOfTokens = 0
                 }
 
+        -- backtick with no closing backtick
         (CodeToken meta) :: rest ->
             let
                 content =
