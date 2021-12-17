@@ -1,15 +1,35 @@
-module Render.Lambda exposing (extract, store)
+module Render.Lambda exposing (apply, extract, store)
 
 import Dict exposing (Dict)
 import Parser.Expr exposing (Expr(..))
 
 
 type alias Lambda =
-    { name : String, args : List String, body : Expr }
+    { name : String, vars : List String, body : Expr }
 
 
-extract : Expr -> Maybe ( List String, Expr )
+extract : Expr -> Maybe Lambda
 extract expr_ =
+    case extractLambda1 expr_ of
+        Just ( args, maybeExpr ) ->
+            case maybeExpr of
+                Just expr ->
+                    case List.head args of
+                        Nothing ->
+                            Nothing
+
+                        Just fname ->
+                            Just { name = fname, vars = List.drop 1 args, body = expr }
+
+                Nothing ->
+                    Nothing
+
+        Nothing ->
+            Nothing
+
+
+extract_ : Expr -> Maybe ( List String, Expr )
+extract_ expr_ =
     case extractLambda1 expr_ of
         Just ( args, maybeExpr ) ->
             case maybeExpr of
@@ -98,36 +118,48 @@ store data dict =
 --
 
 
-{-| if e is (Expr fname ...) then return subst var bdy e); otherwise return e
--}
-apply : String -> String -> Expr -> Expr -> Expr
-apply fname var body e =
-    case e of
-        (Expr fname_ exprs meta) as expr ->
-            if fname == fname_ then
-                subst var body e
-
-            else
-                e
-
-        _ ->
-            e
-
-
 {-| Substitute a for all occurrences of (Text var ..) in e
 -}
-subst : String -> Expr -> Expr -> Expr
-subst var a e =
-    case e of
+subst : Expr -> String -> Expr -> Expr
+subst a var body =
+    case body of
         Text v meta ->
             if v == var then
                 a
 
             else
-                e
+                body
 
         Expr name exprs meta ->
-            Expr name (List.map (subst var a) exprs) meta
+            Expr name (List.map (subst a var) exprs) meta
 
         _ ->
-            e
+            body
+
+
+substInList : Expr -> String -> List Expr -> Expr
+substInList a var exprs =
+    Expr "group" (List.map (\e -> subst e var a) exprs) { begin = 0, end = 0, index = 0 }
+
+
+{-| if e is (Expr fname ...) then return subst var bdy e); otherwise return e
+-}
+apply : Lambda -> Expr -> Expr
+apply lambda expr =
+    case List.head lambda.vars of
+        Nothing ->
+            -- Only handle one var lambdas for now
+            expr |> Debug.log "(1)"
+
+        Just var ->
+            case expr of
+                Expr fname_ exprs _ ->
+                    if lambda.name == fname_ then
+                        --subst expr var lambda.body |> Debug.log "(2)"
+                        substInList lambda.body var exprs |> Debug.log "(2)"
+
+                    else
+                        expr |> Debug.log "(3)"
+
+                _ ->
+                    expr |> Debug.log "(4)"
