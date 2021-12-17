@@ -1,4 +1,4 @@
-module Render.Lambda exposing (apply, extract, store)
+module Render.Lambda exposing (apply, expand, extract, insert)
 
 import Dict exposing (Dict)
 import Parser.Expr exposing (Expr(..))
@@ -28,21 +28,8 @@ extract expr_ =
             Nothing
 
 
-extract_ : Expr -> Maybe ( List String, Expr )
-extract_ expr_ =
-    case extractLambda1 expr_ of
-        Just ( args, maybeExpr ) ->
-            case maybeExpr of
-                Just expr ->
-                    Just ( args, expr )
-
-                Nothing ->
-                    Nothing
-
-        Nothing ->
-            Nothing
-
-
+{-| helper for extract
+-}
 extractLambda1 : Expr -> Maybe ( List String, Maybe Expr )
 extractLambda1 expr_ =
     case expr_ of
@@ -58,6 +45,8 @@ extractLambda1 expr_ =
             Nothing
 
 
+{-| helper for extractLambda1
+-}
 extractLambda2 : Maybe { input : List Expr, args : List String, expr : Maybe Expr } -> Maybe { input : List Expr, args : List String, expr : Maybe Expr }
 extractLambda2 x =
     case x of
@@ -80,42 +69,33 @@ extractLambda2 x =
                     Nothing
 
 
-
--- DIV
-
-
-store : Maybe ( List String, Expr ) -> Dict String ( List String, Expr ) -> Dict String ( List String, Expr )
-store data dict =
+{-| Insert a lambda in the dictionary
+-}
+insert : Maybe Lambda -> Dict String Lambda -> Dict String Lambda
+insert data dict =
     case data of
         Nothing ->
             dict
 
-        Just ( args_, expr ) ->
-            case args_ of
-                name :: args ->
-                    Dict.insert name ( args, expr ) dict
-
-                _ ->
-                    dict
+        Just lambda ->
+            Dict.insert lambda.name lambda dict
 
 
+{-| Expand the given expression using the given dictionary of lambdas.
+-}
+expand : Dict String Lambda -> Expr -> Expr
+expand dict expr =
+    case expr of
+        Expr name _ _ ->
+            case Dict.get name dict of
+                Nothing ->
+                    expr
 
---expand : Dict String ( List String, Expr ) -> Expr -> Expr
---expand dict expr =
---    case expr of
---        Expr name exprs meta ->
---            case Dict.get name dict of
---                Nothing ->
---                    Expr name (List.map (expand dict) exprs) meta
---
---                --Just ( args, body ) ->
---                --    applyLambda name ( args, body ) expr
---                _ ->
---                    expr
---
---        _ ->
---            expr
---
+                Just lambda ->
+                    apply lambda expr
+
+        _ ->
+            expr
 
 
 {-| Substitute a for all occurrences of (Text var ..) in e
@@ -137,29 +117,32 @@ subst a var body =
             body
 
 
+{-| Assume that var x is bound in a. For each expression e in exprs,
+compute subst a x e. Let exprs2 be the resulting list. Return
+E "group" exprs2 ...
+-}
 substInList : Expr -> String -> List Expr -> Expr
 substInList a var exprs =
     Expr "group" (List.map (\e -> subst e var a) exprs) { begin = 0, end = 0, index = 0 }
 
 
-{-| if e is (Expr fname ...) then return subst var bdy e); otherwise return e
+{-| Apply a lambda to an expression.
 -}
 apply : Lambda -> Expr -> Expr
 apply lambda expr =
     case List.head lambda.vars of
         Nothing ->
             -- Only handle one var lambdas for now
-            expr |> Debug.log "(1)"
+            expr
 
         Just var ->
             case expr of
                 Expr fname_ exprs _ ->
                     if lambda.name == fname_ then
-                        --subst expr var lambda.body |> Debug.log "(2)"
-                        substInList lambda.body var exprs |> Debug.log "(2)"
+                        substInList lambda.body var exprs
 
                     else
-                        expr |> Debug.log "(3)"
+                        expr
 
                 _ ->
-                    expr |> Debug.log "(4)"
+                    expr
