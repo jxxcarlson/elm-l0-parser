@@ -8,7 +8,7 @@ import Dict exposing (Dict)
 import Either exposing (Either(..))
 import Parser.Block exposing (BlockType(..), L0BlockE(..))
 import Parser.Expr exposing (Expr(..))
-import Render.Lambda as Lambda
+import Render.Lambda as Lambda exposing (Lambda)
 import Render.Vector as Vector exposing (Vector)
 import Tree exposing (Tree)
 
@@ -16,7 +16,7 @@ import Tree exposing (Tree)
 type alias Accumulator =
     { headingIndex : Vector
     , numberedItemIndex : Int
-    , environment : Dict String ( List String, Expr )
+    , environment : Dict String Lambda
     }
 
 
