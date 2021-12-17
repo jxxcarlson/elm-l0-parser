@@ -1,10 +1,16 @@
 module Render.Accumulator exposing
     ( Accumulator
     , make
+    , storeLambda
+    , subst
     , transformAST
     )
 
+import Dict exposing (Dict)
+import Either exposing (Either(..))
 import Parser.Block exposing (BlockType(..), L0BlockE(..))
+import Parser.Expr exposing (Expr(..))
+import Render.ASTTools as ASTTools
 import Render.Vector as Vector exposing (Vector)
 import Tree exposing (Tree)
 
@@ -12,7 +18,23 @@ import Tree exposing (Tree)
 type alias Accumulator =
     { headingIndex : Vector
     , numberedItemIndex : Int
+    , environment : Dict String ( List String, Expr )
     }
+
+
+
+-- getLambda : String -> Dict String ( List String, Expr ) -> Maybe Lambda
+-- getLambda : comparable -> Dict String ( List String, Expr ) -> Maybe { name : String, args : List str, expr : Expr }
+-- getLambda : comparable -> Dict comparable (a, b) -> Maybe { name : comparable, args : a, expr : b }
+
+
+getLambda : comparable -> Dict String ( List String, Expr ) -> Maybe { name : String, args : List String, expr : Expr }
+getLambda name environment =
+    Dict.get name environment |> Maybe.map (\( args, expr ) -> { name = name, args = args, expr = expr })
+
+
+type alias Lambda =
+    { name : String, args : List String, body : Expr }
 
 
 transformAST : List (Tree L0BlockE) -> List (Tree L0BlockE)
@@ -30,6 +52,7 @@ init : Int -> Accumulator
 init k =
     { headingIndex = Vector.init k
     , numberedItemIndex = 0
+    , environment = Dict.empty
     }
 
 
@@ -83,5 +106,82 @@ updateAccumulator ((L0BlockE { blockType, content }) as block) accumulator =
             in
             { accumulator | numberedItemIndex = numberedItemIndex }
 
+        OrdinaryBlock [ "defs" ] ->
+            case content of
+                Left _ ->
+                    accumulator
+
+                Right exprs ->
+                    { accumulator | environment = List.foldl (\lambda dict -> storeLambda (ASTTools.extractLambda lambda) dict) accumulator.environment exprs }
+
         _ ->
             { accumulator | numberedItemIndex = 0 }
+
+
+storeLambda : Maybe ( List String, Expr ) -> Dict String ( List String, Expr ) -> Dict String ( List String, Expr )
+storeLambda data dict =
+    case data of
+        Nothing ->
+            dict
+
+        Just ( args_, expr ) ->
+            case args_ of
+                name :: args ->
+                    Dict.insert name ( args, expr ) dict
+
+                _ ->
+                    dict
+
+
+
+--expand : Dict String ( List String, Expr ) -> Expr -> Expr
+--expand dict expr =
+--    case expr of
+--        Expr name exprs meta ->
+--            case Dict.get name dict of
+--                Nothing ->
+--                    Expr name (List.map (expand dict) exprs) meta
+--
+--                --Just ( args, body ) ->
+--                --    applyLambda name ( args, body ) expr
+--                _ ->
+--                    expr
+--
+--        _ ->
+--            expr
+--
+
+
+{-| if e is (Expr fname ...) then return subst var bdy e); otherwise return e
+-}
+apply : String -> String -> Expr -> Expr -> Expr
+apply fname var body e =
+    case e of
+        (Expr fname_ exprs meta) as expr ->
+            if fname == fname_ then
+                subst var body e
+
+            else
+                e
+
+        _ ->
+            e
+
+
+{-| Substitute a for all occurrences of (Text var ..) in e
+-}
+subst : String -> Expr -> Expr -> Expr
+subst var a e =
+    case e of
+        Text v meta ->
+            if v == var then
+                a
+
+            else
+                e
+
+        Expr name exprs meta ->
+            Expr name (List.map (subst var a) exprs) meta
+
+        _ ->
+            e
