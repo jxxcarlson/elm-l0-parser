@@ -1,6 +1,5 @@
 module Render.ASTTools exposing
     ( exprListToStringList
-    , extractLambda
     , filterBlocksByArgs
     , getExprsByName
     , getText
@@ -17,58 +16,6 @@ import Maybe.Extra
 import Parser.Block exposing (BlockType(..), L0BlockE(..))
 import Parser.Expr exposing (Expr(..))
 import Tree
-
-
-extractLambda : Expr -> Maybe ( List String, Expr )
-extractLambda expr_ =
-    case extractLambda1 expr_ of
-        Just ( args, maybeExpr ) ->
-            case maybeExpr of
-                Just expr ->
-                    Just ( args, expr )
-
-                Nothing ->
-                    Nothing
-
-        Nothing ->
-            Nothing
-
-
-extractLambda1 : Expr -> Maybe ( List String, Maybe Expr )
-extractLambda1 expr_ =
-    case expr_ of
-        Expr name exprs meta ->
-            if name == "lambda" then
-                extractLambda2 (Just { input = exprs, args = [], expr = Nothing })
-                    |> Maybe.map (\data -> ( data.args |> List.reverse, data.expr ))
-
-            else
-                Nothing
-
-        _ ->
-            Nothing
-
-
-extractLambda2 : Maybe { input : List Expr, args : List String, expr : Maybe Expr } -> Maybe { input : List Expr, args : List String, expr : Maybe Expr }
-extractLambda2 x =
-    case x of
-        Nothing ->
-            Nothing
-
-        Just ({ input, args, expr } as data) ->
-            case input of
-                (Text str _) :: rest ->
-                    if String.trim str == "" then
-                        extractLambda2 (Just { data | input = rest })
-
-                    else
-                        extractLambda2 (Just { data | input = rest, args = str :: args })
-
-                expr_ :: [] ->
-                    Just { data | expr = Just expr_ }
-
-                _ ->
-                    Nothing
 
 
 getExprsByName : String -> List Expr -> List Expr
