@@ -8,7 +8,6 @@ import Dict exposing (Dict)
 import Either exposing (Either(..))
 import Parser.Block exposing (BlockType(..), L0BlockE(..))
 import Parser.Expr exposing (Expr(..))
-import Render.ASTTools as ASTTools
 import Render.Lambda as Lambda
 import Render.Vector as Vector exposing (Vector)
 import Tree exposing (Tree)
@@ -19,12 +18,6 @@ type alias Accumulator =
     , numberedItemIndex : Int
     , environment : Dict String ( List String, Expr )
     }
-
-
-
--- getLambda : String -> Dict String ( List String, Expr ) -> Maybe Lambda
--- getLambda : comparable -> Dict String ( List String, Expr ) -> Maybe { name : String, args : List str, expr : Expr }
--- getLambda : comparable -> Dict comparable (a, b) -> Maybe { name : comparable, args : a, expr : b }
 
 
 getLambda : String -> Dict String ( List String, Expr ) -> Maybe { name : String, args : List String, expr : Expr }
@@ -60,7 +53,6 @@ transformAccumulateTree tree acc =
     let
         transformer : Accumulator -> L0BlockE -> ( Accumulator, L0BlockE )
         transformer =
-            -- \acc_ block_ -> ( updateAccumulator block_ acc_, transformBlock acc_ block_ )
             \acc_ block_ ->
                 let
                     newAcc =
