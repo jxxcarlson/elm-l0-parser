@@ -26,6 +26,13 @@ L0 Examples
 
 The examples are illustrative, not exhaustive.
 
+
+
+| defs
+[lambda bi x [blue [i x]]]
+
+
+
 | heading 1
 Inline constructions
 
