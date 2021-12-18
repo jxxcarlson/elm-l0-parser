@@ -10,63 +10,17 @@ type alias Lambda =
 
 extract : Expr -> Maybe Lambda
 extract expr_ =
-    case extractLambda1 expr_ of
-        Just ( args, maybeExpr ) ->
-            case maybeExpr of
-                Just expr ->
-                    case List.head args of
-                        Nothing ->
-                            Nothing
-
-                        Just fname ->
-                            Just { name = fname, vars = List.drop 1 args, body = expr }
-
-                Nothing ->
-                    Nothing
-
-        Nothing ->
-            Nothing
-
-
-{-| helper for extract
--}
-extractLambda1 : Expr -> Maybe ( List String, Maybe Expr )
-extractLambda1 expr_ =
     case expr_ of
-        Expr name exprs meta ->
-            if name == "lambda" then
-                extractLambda2 (Just { input = exprs, args = [], expr = Nothing })
-                    |> Maybe.map (\data -> ( data.args |> List.reverse, data.expr ))
-
-            else
-                Nothing
-
-        _ ->
-            Nothing
-
-
-{-| helper for extractLambda1
--}
-extractLambda2 : Maybe { input : List Expr, args : List String, expr : Maybe Expr } -> Maybe { input : List Expr, args : List String, expr : Maybe Expr }
-extractLambda2 x =
-    case x of
-        Nothing ->
-            Nothing
-
-        Just ({ input, args, expr } as data) ->
-            case input of
-                (Text str _) :: rest ->
-                    if String.trim str == "" then
-                        extractLambda2 (Just { data | input = rest })
-
-                    else
-                        extractLambda2 (Just { data | input = rest, args = str :: args })
-
-                expr_ :: [] ->
-                    Just { data | expr = Just expr_ }
+        Expr "lambda" ((Text argString _) :: expr :: []) _ ->
+            case String.words argString of
+                name :: rest ->
+                    Just { name = name, vars = rest, body = expr }
 
                 _ ->
                     Nothing
+
+        _ ->
+            Nothing
 
 
 {-| Insert a lambda in the dictionary

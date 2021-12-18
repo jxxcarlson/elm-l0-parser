@@ -100,7 +100,7 @@ updateAccumulator ((L0BlockE { blockType, content }) as block) accumulator =
                     accumulator
 
                 Right exprs ->
-                    { accumulator | environment = List.foldl (\lambda dict -> Lambda.insert (Lambda.extract lambda) dict) accumulator.environment exprs } |> Debug.log "Lambdas"
+                    { accumulator | environment = List.foldl (\lambda dict -> Lambda.insert (Lambda.extract lambda) dict) accumulator.environment exprs }
 
         _ ->
             { accumulator | numberedItemIndex = 0 }

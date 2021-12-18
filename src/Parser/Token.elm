@@ -275,7 +275,7 @@ nextStep state =
                         newToken :: List.drop 1 state.tokens
 
             lastToken =
-                if List.member state.lastTokenType [ Nothing, Just TLB ] then
+                if List.member state.lastTokenType [ Nothing, Just TLB, Just TRB ] then
                     Nothing
 
                 else
@@ -309,7 +309,7 @@ mergeTokens lastToken_ token =
             ( token, TokensUnchanged )
 
         Just lastToken ->
-            if isTextToken lastToken == isTextToken token then
+            if isTextToken lastToken && isTextToken token then
                 ( mergeTokensAux lastToken token, TokensMerged )
 
             else

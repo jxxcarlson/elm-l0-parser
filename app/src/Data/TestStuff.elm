@@ -7,6 +7,10 @@ import Parser.Simple as Simple exposing (ExprS(..), simplify)
 import Render.Lambda as Lambda exposing (Lambda)
 
 
+lambdaText =
+    "[lambda bi x [b [i x]]]"
+
+
 lambdaExpr : Maybe Expr
 lambdaExpr =
     Expression.parse_ "[lambda bi x [b [i x]]]" |> List.head
