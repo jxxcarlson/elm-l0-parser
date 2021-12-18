@@ -93,13 +93,14 @@ updateAccumulator ((L0BlockE { blockType, content }) as block) accumulator =
             in
             { accumulator | numberedItemIndex = numberedItemIndex }
 
+        -- insert definitions of lambdas
         OrdinaryBlock [ "defs" ] ->
             case content of
                 Left _ ->
                     accumulator
 
                 Right exprs ->
-                    { accumulator | environment = List.foldl (\lambda dict -> Lambda.insert (Lambda.extract lambda) dict) accumulator.environment exprs }
+                    { accumulator | environment = List.foldl (\lambda dict -> Lambda.insert (Lambda.extract lambda) dict) accumulator.environment exprs } |> Debug.log "Lambdas"
 
         _ ->
             { accumulator | numberedItemIndex = 0 }

@@ -56,6 +56,26 @@ renderMarked name generation settings exprList =
             f generation settings exprList
 
 
+
+--renderMarked : String -> Int -> Settings -> List Expr -> Element MarkupMsg
+--renderMarked name generation settings exprList =
+--    case Dict.get name markupDict of
+--        Nothing ->
+--            case Dict.get name settings.environment of
+--                Nothing ->
+--                    Element.paragraph [ spacing 8 ] (Element.el [ Font.color errorColor, Font.bold ] (Element.text name) :: List.map (render generation settings) exprList)
+--
+--                Just lambda ->
+--                    let
+--                        exprList2 =
+--                            List.map (Lambda.apply lambda) exprList
+--                    in
+--                    List.map (render generation settings) exprList2
+--
+--        Just f ->
+--            f generation settings exprList
+
+
 markupDict : Dict String (Int -> Settings -> List Expr -> Element MarkupMsg)
 markupDict =
     Dict.fromList
