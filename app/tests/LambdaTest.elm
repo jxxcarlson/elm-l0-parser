@@ -13,17 +13,17 @@ import Test exposing (..)
 
 lambdaExpr : Maybe Expr
 lambdaExpr =
-    Expression.parse_ "[lambda bi x [b [i x]]]" |> List.head
+    Expression.parse_ "[lambda bi x [b [i x]]]" |> List.head |> Debug.log "lambdaExpr"
 
 
 expr : Maybe Expr
 expr =
-    Expression.parse_ "[bi [bird flower]]" |> List.head
+    Expression.parse_ "[bi [bird flower]]" |> List.head |> Debug.log "expr"
 
 
 lambda : Maybe Lambda
 lambda =
-    Maybe.andThen Lambda.extract lambdaExpr
+    Maybe.andThen Lambda.extract lambdaExpr |> Debug.log "lambda"
 
 
 lambdaDict : Dict String Lambda
