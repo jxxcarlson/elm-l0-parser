@@ -1,6 +1,25 @@
 module Data.TestDoc exposing (..)
 
 
+t1 =
+    """Note that inline elements can [i [b be composed.]] That was italic
+bold. Let's not be boring: we can also do colors:
+[blue blue stuff] and [red red stuff].  Of course, colors compose also: [i  [b [red Merry Christmas!]]]
+"""
+
+
+t11 =
+    """Note that inline elements can [i [b be composed.]] That was italic"""
+
+
+t12 =
+    """bold. Let's not be boring: we can also do colors:"""
+
+
+t13 =
+    """[blue blue stuff] and [red red stuff].  Of course, colors compose also: [i  [b [red Merry Christmas!]]]"""
+
+
 text1 =
     """
 one
