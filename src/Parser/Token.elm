@@ -306,14 +306,14 @@ mergeTokens : Maybe Token -> Token -> ( Token, MergeStatus )
 mergeTokens lastToken_ token =
     case lastToken_ of
         Nothing ->
-            ( token, TokensUnchanged ) |> Debug.log "(1)"
+            ( token, TokensUnchanged )
 
         Just lastToken ->
             if isTextToken lastToken == isTextToken token then
-                ( mergeTokensAux lastToken token, TokensMerged ) |> Debug.log "(2)"
+                ( mergeTokensAux lastToken token, TokensMerged )
 
             else
-                ( token, TokensUnchanged ) |> Debug.log "(3)"
+                ( token, TokensUnchanged )
 
 
 mergeTokensAux : Token -> Token -> Token
