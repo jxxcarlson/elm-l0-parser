@@ -95,7 +95,6 @@ markupDict =
         --
         , ( "skip", \g s exprList -> skip g s exprList )
         , ( "link", \g s exprList -> link g s exprList )
-        , ( "href", \g s exprList -> href g s exprList )
         , ( "abstract", \g s exprList -> abstract g s exprList )
         , ( "large", \g s exprList -> large g s exprList )
         , ( "mdash", \g s exprList -> Element.el [] (Element.text "—") )
@@ -130,45 +129,35 @@ abstract g s exprList =
     Element.paragraph [] [ Element.el [ Font.size 18 ] (Element.text "Abstract."), simpleElement [] g s exprList ]
 
 
+large : Int -> Settings -> List Expr -> Element MarkupMsg
 large g s exprList =
     simpleElement [ Font.size 18 ] g s exprList
 
 
+link : Int -> Settings -> List Expr -> Element MarkupMsg
 link g s exprList =
-    let
-        args =
-            getArgs exprList
+    case List.head <| ASTTools.exprListToStringList exprList of
+        Nothing ->
+            errorText_ "Please provide label and url"
 
-        n =
-            List.length args
+        Just argString ->
+            let
+                args =
+                    String.words argString
 
-        label =
-            List.drop 1 args |> String.join " "
+                n =
+                    List.length args
 
-        url =
-            List.take 1 args |> String.join " "
-    in
-    link_ url label
+                label =
+                    List.take (n - 1) args |> String.join " "
 
-
-link_ : String -> String -> Element MarkupMsg
-link_ url label =
-    newTabLink []
-        { url = url
-        , label = el [ Font.color linkColor ] (Element.text label)
-        }
-
-
-href g s exprList =
-    f2 href_ g s exprList
-
-
-href_ : String -> String -> Element MarkupMsg
-href_ url label =
-    newTabLink []
-        { url = url
-        , label = el [ Font.color linkColor, Font.italic ] (Element.text <| label)
-        }
+                url =
+                    List.drop (n - 1) args |> String.join " "
+            in
+            newTabLink []
+                { url = url
+                , label = el [ Font.color linkColor ] (Element.text label)
+                }
 
 
 image generation settings body =
@@ -419,6 +408,10 @@ htmlId str =
 
 errorText index str =
     Element.el [ Font.color (Element.rgb255 200 40 40) ] (Element.text <| "(" ++ String.fromInt index ++ ") not implemented: " ++ str)
+
+
+errorText_ str =
+    Element.el [ Font.color (Element.rgb255 200 40 40) ] (Element.text str)
 
 
 invisible g s exprList =
