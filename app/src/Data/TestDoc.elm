@@ -50,7 +50,7 @@ The examples are illustrative, not exhaustive.
 | defs
 [lambda bi x [blue [i x]]]
 
-
+[bi This is a test of macro expansion.]
 
 | heading 1
 Inline constructions
