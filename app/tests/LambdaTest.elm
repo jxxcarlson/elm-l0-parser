@@ -51,11 +51,10 @@ suite =
     describe "Render.Lambda"
         [ test "subst" <|
             \_ -> Maybe.map3 Lambda.subst aExpr (Just "x") fExpr |> Maybe.map Simple.simplify |> Expect.equal (Just (ExprS "f" [ TextS "a" ]))
-        , Test.only <|
-            test "expand" <|
-                \_ ->
-                    expr
-                        |> Maybe.map (Lambda.expand lambdaDict)
-                        |> Maybe.map Simple.simplify
-                        |> Expect.equal (Just (ExprS "group" [ ExprS "b" [ TextS " ", ExprS "i" [ TextS " bird" ] ], ExprS "b" [ TextS " ", ExprS "i" [ TextS " flower" ] ] ]))
+        , test "expand" <|
+            \_ ->
+                expr
+                    |> Maybe.map (Lambda.expand lambdaDict)
+                    |> Maybe.map Simple.simplify
+                    |> Expect.equal (Just (ExprS "group" [ ExprS "b" [ TextS " ", ExprS "i" [ TextS " bird" ] ], ExprS "b" [ TextS " ", ExprS "i" [ TextS " flower" ] ] ]))
         ]
