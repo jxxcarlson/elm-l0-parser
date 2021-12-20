@@ -23,7 +23,7 @@ import Tree.Build exposing (Error)
 
 {-| -}
 type alias AST =
-    List (Tree Parser.Block.L0BlockE)
+    List (Tree Parser.Block.ExpressionBlock)
 
 
 isVerbatimLine : String -> Bool

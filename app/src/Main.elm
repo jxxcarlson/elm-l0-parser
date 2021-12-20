@@ -16,7 +16,7 @@ import L0
 import Process
 import Render.Accumulator as RenderAccumulator
 import Render.L0
-import Render.Msg exposing (MarkupMsg)
+import Render.Msg exposing (L0Msg)
 import Render.Settings exposing (Settings)
 import Render.TOC
 import Task exposing (Task)
@@ -70,7 +70,7 @@ type Msg
     | LoadDocumentText String
     | IncrementCounter
     | SetViewMode ViewMode
-    | Render Render.Msg.MarkupMsg
+    | Render Render.Msg.L0Msg
     | SetViewPortForElement (Result Dom.Error ( Dom.Element, Dom.Viewport ))
 
 

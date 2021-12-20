@@ -9,12 +9,12 @@ import Html.Attributes
 import Parser.Expr exposing (Expr(..))
 import Render.ASTTools as ASTTools
 import Render.Math
-import Render.Msg exposing (MarkupMsg(..))
+import Render.Msg exposing (L0Msg(..))
 import Render.Settings exposing (Settings)
 import Render.Utility as Utility
 
 
-render : Int -> Settings -> Expr -> Element MarkupMsg
+render : Int -> Settings -> Expr -> Element L0Msg
 render generation settings expr =
     case expr of
         Text string meta ->
@@ -69,7 +69,7 @@ renderMarked name generation settings exprList =
 -- DICTIONARIES
 
 
-markupDict : Dict String (Int -> Settings -> List Expr -> Element MarkupMsg)
+markupDict : Dict String (Int -> Settings -> List Expr -> Element L0Msg)
 markupDict =
     Dict.fromList
         [ ( "bibitem", \g s exprList -> bibitem g s exprList )
@@ -134,12 +134,12 @@ abstract g s exprList =
     Element.paragraph [] [ Element.el [ Font.size 18 ] (Element.text "Abstract."), simpleElement [] g s exprList ]
 
 
-large : Int -> Settings -> List Expr -> Element MarkupMsg
+large : Int -> Settings -> List Expr -> Element L0Msg
 large g s exprList =
     simpleElement [ Font.size 18 ] g s exprList
 
 
-link : Int -> Settings -> List Expr -> Element MarkupMsg
+link : Int -> Settings -> List Expr -> Element L0Msg
 link g s exprList =
     case List.head <| ASTTools.exprListToStringList exprList of
         Nothing ->
@@ -231,12 +231,12 @@ image generation settings body =
         ]
 
 
-bibitem : Int -> Settings -> List Expr -> Element MarkupMsg
+bibitem : Int -> Settings -> List Expr -> Element L0Msg
 bibitem generation settings str =
     Element.paragraph [ Element.width Element.fill ] [ Element.text (ASTTools.exprListToStringList str |> String.join " " |> (\s -> "[" ++ s ++ "]")) ]
 
 
-cite : Int -> Settings -> List Expr -> Element MarkupMsg
+cite : Int -> Settings -> List Expr -> Element L0Msg
 cite generation settings str =
     Element.paragraph [ Element.width Element.fill ] [ Element.text (ASTTools.exprListToStringList str |> String.join " " |> (\s -> "[" ++ s ++ "]")) ]
 
@@ -249,12 +249,12 @@ math g s m str =
     mathElement g s m str
 
 
-table : Int -> Settings -> List Expr -> Element MarkupMsg
+table : Int -> Settings -> List Expr -> Element L0Msg
 table g s rows =
     Element.column [ Element.spacing 8 ] (List.map (tableRow g s) rows)
 
 
-tableRow : Int -> Settings -> Expr -> Element MarkupMsg
+tableRow : Int -> Settings -> Expr -> Element L0Msg
 tableRow g s expr =
     case expr of
         Expr "tableRow" items _ ->
@@ -264,7 +264,7 @@ tableRow g s expr =
             Element.none
 
 
-tableItem : Int -> Settings -> Expr -> Element MarkupMsg
+tableItem : Int -> Settings -> Expr -> Element L0Msg
 tableItem g s expr =
     case expr of
         Expr "tableItem" exprList _ ->
@@ -284,7 +284,7 @@ skip g s exprList =
         numVal str =
             String.toInt str |> Maybe.withDefault 0
 
-        f : String -> Element MarkupMsg
+        f : String -> Element L0Msg
         f str =
             column [ Element.spacingXY 0 (numVal str) ] [ Element.text "" ]
     in
@@ -372,14 +372,14 @@ getArgs exprs =
         |> String.words
 
 
-simpleElement : List (Element.Attribute MarkupMsg) -> Int -> Settings -> List Expr -> Element MarkupMsg
+simpleElement : List (Element.Attribute L0Msg) -> Int -> Settings -> List Expr -> Element L0Msg
 simpleElement formatList g s exprList =
     Element.paragraph formatList (List.map (render g s) exprList)
 
 
 {-| For one-element functions
 -}
-f1 : (String -> Element MarkupMsg) -> Int -> Settings -> List Expr -> Element MarkupMsg
+f1 : (String -> Element L0Msg) -> Int -> Settings -> List Expr -> Element L0Msg
 f1 f g s exprList =
     case ASTTools.exprListToStringList exprList of
         -- TODO: temporary fix: parse is producing the args in reverse order
@@ -392,7 +392,7 @@ f1 f g s exprList =
 
 {-| For two-element functions
 -}
-f2 : (String -> String -> Element MarkupMsg) -> Int -> Settings -> List Expr -> Element MarkupMsg
+f2 : (String -> String -> Element L0Msg) -> Int -> Settings -> List Expr -> Element L0Msg
 f2 element g s exprList =
     case ASTTools.exprListToStringList exprList of
         -- TODO: temporary fix: parse is producing the args in reverse order
@@ -433,7 +433,7 @@ makeSlug str =
     str |> String.toLower |> String.replace " " "-"
 
 
-makeId : List Expr -> Element.Attribute MarkupMsg
+makeId : List Expr -> Element.Attribute L0Msg
 makeId exprList =
     Utility.elementAttribute "id" (ASTTools.stringValueOfList exprList |> String.trim |> makeSlug)
 
