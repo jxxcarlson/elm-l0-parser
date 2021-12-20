@@ -1,6 +1,6 @@
 module L0 exposing
-    ( AST, parse
-    , b, bb
+    ( parse
+    , SyntaxTree, b, bb
     )
 
 {-| A Parser for the experimental L0 module. See the app folder to see how it is used.
@@ -22,7 +22,7 @@ import Tree.Build exposing (Error)
 
 
 {-| -}
-type alias AST =
+type alias SyntaxTree =
     List (Tree Parser.Block.ExpressionBlock)
 
 
@@ -32,7 +32,7 @@ isVerbatimLine str =
 
 
 {-| -}
-parse : String -> AST
+parse : String -> SyntaxTree
 parse sourceText =
     sourceText
         |> Tree.BlocksV.fromStringAsParagraphs isVerbatimLine

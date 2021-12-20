@@ -33,7 +33,7 @@ main =
 
 type alias Model =
     { sourceText : String
-    , ast : L0.AST
+    , ast : L0.SyntaxTree
     , count : Int
     , windowHeight : Int
     , windowWidth : Int
@@ -390,7 +390,7 @@ render1 sourceText count =
         |> List.map (Element.map Render)
 
 
-render : L0.AST -> Int -> List (Element Msg)
+render : L0.SyntaxTree -> Int -> List (Element Msg)
 render ast count =
     Render.L0.renderFromAST count defaultSettings ast
         |> List.map (Element.map Render)

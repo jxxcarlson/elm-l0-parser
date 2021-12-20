@@ -14,7 +14,7 @@ import Render.Settings
 import Render.Utility
 
 
-view : Int -> Render.Settings.Settings -> L0.AST -> Element Render.Msg.L0Msg
+view : Int -> Render.Settings.Settings -> L0.SyntaxTree -> Element Render.Msg.L0Msg
 view counter settings ast =
     Element.column [ Element.spacing 8, Element.paddingEach { left = 0, right = 0, top = 0, bottom = 36 } ]
         (prepareTOC counter Render.Settings.defaultSettings ast)
@@ -43,7 +43,7 @@ viewTocItem count settings (ExpressionBlock { args, content, lineNumber }) =
             Element.link [ Font.color (Element.rgb 0 0 0.8) ] { url = Render.Utility.internalLink t, label = label }
 
 
-prepareTOC : Int -> Render.Settings.Settings -> L0.AST -> List (Element L0Msg)
+prepareTOC : Int -> Render.Settings.Settings -> L0.SyntaxTree -> List (Element L0Msg)
 prepareTOC count settings ast =
     let
         rawToc =
@@ -107,7 +107,7 @@ tocIndentAux args =
             String.toInt str |> Maybe.withDefault 0 |> (\x -> 12 * x)
 
 
-getHeadings : L0.AST -> { title : Maybe (List Expr), subtitle : Maybe (List Expr) }
+getHeadings : L0.SyntaxTree -> { title : Maybe (List Expr), subtitle : Maybe (List Expr) }
 getHeadings ast =
     let
         data =

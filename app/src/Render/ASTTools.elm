@@ -11,7 +11,7 @@ module Render.ASTTools exposing
     )
 
 import Either exposing (Either(..))
-import L0 exposing (AST)
+import L0 exposing (SyntaxTree)
 import Maybe.Extra
 import Parser.Block exposing (BlockType(..), ExpressionBlock(..))
 import Parser.Expr exposing (Expr(..))
@@ -36,7 +36,7 @@ matchExpr name expr =
             False
 
 
-matchingIdsInAST : String -> AST -> List String
+matchingIdsInAST : String -> SyntaxTree -> List String
 matchingIdsInAST key ast =
     ast |> List.map Tree.flatten |> List.concat |> List.filterMap (idOfMatchingBlockContent key)
 
@@ -50,17 +50,17 @@ idOfMatchingBlockContent key (ExpressionBlock { sourceText, id }) =
         Nothing
 
 
-title : L0.AST -> List ExpressionBlock
+title : L0.SyntaxTree -> List ExpressionBlock
 title ast =
     filterBlocksByArgs "title" ast
 
 
-tableOfContents : L0.AST -> List ExpressionBlock
+tableOfContents : L0.SyntaxTree -> List ExpressionBlock
 tableOfContents ast =
     filterBlocksByArgs "heading" ast
 
 
-filterBlocksByArgs : String -> L0.AST -> List ExpressionBlock
+filterBlocksByArgs : String -> L0.SyntaxTree -> List ExpressionBlock
 filterBlocksByArgs key ast =
     ast
         |> List.map Tree.flatten

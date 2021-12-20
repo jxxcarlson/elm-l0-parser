@@ -1,7 +1,7 @@
 module Render.L0 exposing (renderFromAST, renderFromString, render_)
 
 import Element exposing (Element)
-import L0 exposing (AST)
+import L0 exposing (SyntaxTree)
 import Render.Accumulator as Accumulator exposing (Accumulator)
 import Render.Block
 import Render.Msg exposing (L0Msg)
@@ -19,12 +19,12 @@ renderFromString count settings str =
     str |> L0.parse |> renderFromAST count settings
 
 
-render_ : AST -> List (Element L0Msg)
+render_ : SyntaxTree -> List (Element L0Msg)
 render_ ast =
     renderFromAST 0 Render.Settings.defaultSettings ast
 
 
-renderFromAST : Int -> Settings -> AST -> List (Element L0Msg)
+renderFromAST : Int -> Settings -> SyntaxTree -> List (Element L0Msg)
 renderFromAST count settings ast =
     ast
         |> List.map (Tree.map (Render.Block.render count settings))
