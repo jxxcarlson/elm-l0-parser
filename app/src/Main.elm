@@ -14,7 +14,7 @@ import Html.Events exposing (keyCode, on, onClick, onInput)
 import Json.Decode
 import L0
 import Process
-import Render.Accumulator as RenderAccumulator
+import Render.Acc as RenderAccumulator
 import Render.L0
 import Render.Msg exposing (L0Msg)
 import Render.Settings exposing (Settings)
@@ -81,7 +81,7 @@ type alias Flags =
 init : Flags -> ( Model, Cmd Msg )
 init flags =
     ( { sourceText = Data.TestDoc.text
-      , ast = L0.parse Data.TestDoc.text |> RenderAccumulator.transformAST
+      , ast = L0.parse Data.TestDoc.text |> RenderAccumulator.transformST
       , count = 0
       , windowHeight = flags.height
       , windowWidth = flags.width
@@ -122,7 +122,7 @@ update msg model =
         InputText str ->
             ( { model
                 | sourceText = str
-                , ast = L0.parse str |> RenderAccumulator.transformAST
+                , ast = L0.parse str |> RenderAccumulator.transformST
                 , count = model.count + 1
               }
             , Cmd.none

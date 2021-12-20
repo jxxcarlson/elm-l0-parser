@@ -5,6 +5,7 @@ import Element exposing (Element, alignLeft, alignRight, centerX, column, el, ne
 import Element.Background as Background
 import Element.Events as Events
 import Element.Font as Font
+import Element.Input as Input
 import Html.Attributes
 import Parser.Expr exposing (Expr(..))
 import Render.ASTTools as ASTTools
@@ -95,6 +96,7 @@ markupDict =
         --
         , ( "skip", \g s exprList -> skip g s exprList )
         , ( "link", \g s exprList -> link g s exprList )
+        , ( "ilink", \g s exprList -> ilink g s exprList )
         , ( "abstract", \g s exprList -> abstract g s exprList )
         , ( "large", \g s exprList -> large g s exprList )
         , ( "mdash", \g s exprList -> Element.el [] (Element.text "—") )
@@ -162,6 +164,31 @@ link g s exprList =
             newTabLink []
                 { url = url
                 , label = el [ Font.color linkColor ] (Element.text label)
+                }
+
+
+ilink g s exprList =
+    case List.head <| ASTTools.exprListToStringList exprList of
+        Nothing ->
+            errorText_ "Please provide label and url"
+
+        Just argString ->
+            let
+                args =
+                    String.words argString
+
+                n =
+                    List.length args
+
+                label =
+                    List.take (n - 1) args |> String.join " "
+
+                docId =
+                    List.drop (n - 1) args |> String.join " "
+            in
+            Input.button []
+                { onPress = Just (GetPublicDocument docId)
+                , label = Element.el [ Element.centerX, Element.centerY, Font.size 14, Font.color (Element.rgb 0 0 0.8) ] (Element.text label)
                 }
 
 

@@ -1,7 +1,7 @@
-module Render.Accumulator exposing
+module Render.Acc exposing
     ( Accumulator
     , make
-    , transformAST
+    , transformST
     )
 
 import Dict exposing (Dict)
@@ -25,8 +25,8 @@ getLambda name environment =
     Dict.get name environment |> Maybe.map (\( args, expr ) -> { name = name, args = args, expr = expr })
 
 
-transformAST : List (Tree ExpressionBlock) -> List (Tree ExpressionBlock)
-transformAST ast =
+transformST : List (Tree ExpressionBlock) -> List (Tree ExpressionBlock)
+transformST ast =
     ast |> make |> Tuple.second
 
 
