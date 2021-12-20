@@ -24,12 +24,12 @@ $$
 
 testExport label str =
     test label <|
-        \_ -> L0.parse str |> LaTeX.render Settings.defaultSettings |> Expect.equal str
+        \_ -> L0.parse str |> LaTeX.export Settings.defaultSettings |> Expect.equal str
 
 
 testExportModSpace label str =
     test label <|
-        \_ -> L0.parse str |> LaTeX.render Settings.defaultSettings |> String.replace " " "" |> Expect.equal (String.replace " " "" str)
+        \_ -> L0.parse str |> LaTeX.export Settings.defaultSettings |> String.replace " " "" |> Expect.equal (String.replace " " "" str)
 
 
 suite : Test

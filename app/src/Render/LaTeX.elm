@@ -1,4 +1,4 @@
-module Render.LaTeX exposing (render)
+module Render.LaTeX exposing (export)
 
 import Either exposing (Either(..))
 import L0 exposing (SyntaxTree)
@@ -8,8 +8,8 @@ import Render.Settings exposing (Settings)
 import Tree exposing (Tree)
 
 
-render : Settings -> SyntaxTree -> String
-render settings ast =
+export : Settings -> SyntaxTree -> String
+export settings ast =
     ast
         |> List.map (Tree.map (renderBlock settings))
         |> List.map unravel
