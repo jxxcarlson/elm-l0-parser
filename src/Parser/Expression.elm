@@ -1,7 +1,7 @@
 module Parser.Expression exposing
     ( State
     , parse
-    , parse_
+    , parseToState
     , run
     )
 
@@ -50,13 +50,13 @@ init str =
 -- PARSER
 
 
-parse_ : String -> List Expr
-parse_ str =
-    parse str |> .committed
-
-
-parse : String -> State
+parse : String -> List Expr
 parse str =
+    parseToState str |> .committed
+
+
+parseToState : String -> State
+parseToState str =
     run (init str)
 
 

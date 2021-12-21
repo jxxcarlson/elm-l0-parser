@@ -36,7 +36,7 @@ errorTest label input output =
 idem : String -> String
 idem str =
     str
-        |> Expression.parse
+        |> Expression.parseToState
         |> .committed
         |> Text.print
 

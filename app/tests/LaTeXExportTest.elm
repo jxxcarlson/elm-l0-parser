@@ -37,5 +37,5 @@ suite =
     describe "Render.LaTeX"
         [ testExportModSpace "export paragraph" "one two!"
         , testExport "code block" "|| code\na[0] = 1!\n5! = 60."
-        , Test.only <| testExportModSpace "ordinary block" "| foo!\n5! = 60."
+        , testExportModSpace "ordinary block" "| foo!\n5! = 60."
         ]

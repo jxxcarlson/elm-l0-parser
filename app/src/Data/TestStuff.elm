@@ -13,12 +13,12 @@ lambdaText =
 
 lambdaExpr : Maybe Expr
 lambdaExpr =
-    Expression.parse_ "[lambda bi x [b [i x]]]" |> List.head
+    Expression.parse "[lambda bi x [b [i x]]]" |> List.head
 
 
 expr : Maybe Expr
 expr =
-    Expression.parse_ "[bi [bird flower]]" |> List.head
+    Expression.parse "[bi [bird flower]]" |> List.head
 
 
 lambda : Maybe Lambda
