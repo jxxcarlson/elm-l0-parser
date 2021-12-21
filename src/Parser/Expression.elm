@@ -64,17 +64,14 @@ parse : String -> List Expr
 parse str =
     str
         |> Token.run
-        |> initWithTokens
-        |> run
-        |> .committed
+        |> parseTokenList
 
 
 parseToState : String -> State
 parseToState str =
     str
         |> Token.run
-        |> initWithTokens
-        |> run
+        |> parseTokenListToState
 
 
 
