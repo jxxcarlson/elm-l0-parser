@@ -3,7 +3,6 @@ module Parser.BlockUtil exposing (l0Empty, toBlock, toExpressionBlock, toL0Block
 import Either exposing (Either(..))
 import Parser.Block exposing (BlockType(..), ExpressionBlock(..))
 import Parser.Expression
-import Tree.Blocks
 import Tree.BlocksV
 
 
