@@ -1,4 +1,4 @@
-module Render.LaTeX exposing (export, rawExport)
+module Render.LaTeX exposing (export, rawExport, renderExpr)
 
 import Dict exposing (Dict)
 import Either exposing (Either(..))
@@ -49,7 +49,11 @@ renderBlock settings ((ExpressionBlock { blockType, name, content, children }) a
                             f settings args (renderExprList settings exprs_)
 
                         Nothing ->
-                            environment name_ (renderExprList settings exprs_)
+                            if name_ == "defs" then
+                                renderDefs exprs_
+
+                            else
+                                environment name_ (renderExprList settings exprs_)
 
         VerbatimBlock _ ->
             case content of
@@ -74,13 +78,42 @@ renderBlock settings ((ExpressionBlock { blockType, name, content, children }) a
                     "???"
 
 
+renderDefs exprs =
+    Debug.toString exprs
+
+
+
+-- DICIONARIES
+
+
+verbatimExprDict =
+    Dict.empty
+
+
+blockNames : Dict String String
+blockNames =
+    Dict.fromList
+        [ ( "code", "verbatim" )
+        ]
+
+
+functionDict : Dict String String
+functionDict =
+    Dict.fromList
+        [ ( "italic", "textit" )
+        , ( "i", "textit" )
+        , ( "bold", "textbf" )
+        , ( "b", "textbf" )
+        ]
+
+
 blockDict : Dict String (Settings -> List String -> String -> String)
 blockDict =
     Dict.fromList
-        [ ( "title", \sett args body -> macro1 (firstArg args) body )
-        , ( "subtitle", \sett args body -> macro1 (firstArg args) body )
-        , ( "author", \sett args body -> macro1 (firstArg args) body )
-        , ( "date", \sett args body -> macro1 (firstArg args) body )
+        [ ( "title", \sett args body -> "" )
+        , ( "subtitle", \sett args body -> "" )
+        , ( "author", \sett args body -> "" )
+        , ( "date", \sett args body -> "" )
         , ( "heading", \sett args body -> heading args body )
         ]
 
@@ -135,16 +168,6 @@ macro1 name arg =
                 "\\" ++ realName ++ "{" ++ String.trimLeft arg ++ "}"
 
 
-functionDict : Dict String String
-functionDict =
-    Dict.fromList
-        [ ( "italic", "textit" )
-        , ( "i", "textit" )
-        , ( "bold", "textbf" )
-        , ( "b", "textbf" )
-        ]
-
-
 renderExprList : Settings -> List Expr -> String
 renderExprList settings exprs =
     List.map (renderExpr settings) exprs |> String.join ""
@@ -173,17 +196,6 @@ renderVerbatim name body =
 
         Just macroName ->
             macro1 macroName body
-
-
-verbatimExprDict =
-    Dict.empty
-
-
-blockNames : Dict String String
-blockNames =
-    Dict.fromList
-        [ ( "code", "verbatim" )
-        ]
 
 
 {-| Comment on this!

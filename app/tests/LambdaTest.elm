@@ -6,7 +6,9 @@ import Fuzz exposing (Fuzzer, int, list, string)
 import Parser.Expr exposing (Expr(..))
 import Parser.Expression as Expression
 import Parser.Simple as Simple exposing (ExprS(..))
+import Render.LaTeX
 import Render.Lambda as Lambda exposing (Lambda)
+import Render.Settings
 import Render.Text as Text
 import Test exposing (..)
 
@@ -51,10 +53,13 @@ suite =
     describe "Render.Lambda"
         [ test "subst" <|
             \_ -> Maybe.map3 Lambda.subst aExpr (Just "x") fExpr |> Maybe.map Simple.simplify |> Expect.equal (Just (ExprS "f" [ TextS "a" ]))
-        , test "expand" <|
-            \_ ->
-                expr
-                    |> Maybe.map (Lambda.expand lambdaDict)
-                    |> Maybe.map Simple.simplify
-                    |> Expect.equal (Just (ExprS "group" [ ExprS "b" [ TextS " ", ExprS "i" [ TextS " bird" ] ], ExprS "b" [ TextS " ", ExprS "i" [ TextS " flower" ] ] ]))
+        , Test.only <|
+            test "expand" <|
+                \_ ->
+                    expr
+                        |> Maybe.map (Lambda.expand lambdaDict)
+                        |> Maybe.map Simple.simplify
+                        |> Expect.equal (Just (ExprS "group" [ ExprS "b" [ TextS " ", ExprS "i" [ TextS " bird" ] ], ExprS "b" [ TextS " ", ExprS "i" [ TextS " flower" ] ] ]))
+        , test "toString" <|
+            \_ -> lambda |> Maybe.map (Lambda.toString (Render.LaTeX.renderExpr Render.Settings.defaultSettings)) |> Expect.equal (Just "\\newcommand{bi[1]{\\textbf{\\textit{x}}]")
         ]
