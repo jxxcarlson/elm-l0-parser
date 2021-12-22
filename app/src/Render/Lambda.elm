@@ -105,13 +105,13 @@ apply lambda expr =
 
 toString : (Expr -> String) -> Lambda -> String
 toString exprToString lambda =
-    [ "\\newcommand{"
+    [ "\\newcommand{\\"
     , lambda.name
-    , "["
+    , "}["
     , String.fromInt (List.length lambda.vars)
     , "]{"
     , lambda.body |> exprToString |> mapArgs lambda.vars
-    , "]"
+    , "}    "
     ]
         |> String.join ""
 

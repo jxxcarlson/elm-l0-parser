@@ -1,4 +1,4 @@
-module Render.LaTeX exposing (export, rawExport, renderExpr)
+module Render.LaTeX exposing (export, exportExpr, rawExport)
 
 import Dict exposing (Dict)
 import Either exposing (Either(..))
@@ -6,6 +6,7 @@ import L0 exposing (SyntaxTree)
 import List.Extra
 import Parser.Block exposing (BlockType(..), ExpressionBlock(..))
 import Parser.Expr exposing (Expr(..))
+import Render.Lambda as Lambda
 import Render.Settings exposing (Settings)
 import Tree exposing (Tree)
 
@@ -18,13 +19,13 @@ export settings ast =
 rawExport : Settings -> SyntaxTree -> String
 rawExport settings ast =
     ast
-        |> List.map (Tree.map (renderBlock settings))
+        |> List.map (Tree.map (exportBlock settings))
         |> List.map unravel
         |> String.join "\n\n"
 
 
-renderBlock : Settings -> ExpressionBlock -> String
-renderBlock settings ((ExpressionBlock { blockType, name, content, children }) as block) =
+exportBlock : Settings -> ExpressionBlock -> String
+exportBlock settings ((ExpressionBlock { blockType, name, content, children }) as block) =
     case blockType of
         Paragraph ->
             case content of
@@ -32,7 +33,7 @@ renderBlock settings ((ExpressionBlock { blockType, name, content, children }) a
                     str
 
                 Right exprs_ ->
-                    renderExprList settings exprs_
+                    exportExprList settings exprs_
 
         OrdinaryBlock args ->
             case content of
@@ -46,14 +47,14 @@ renderBlock settings ((ExpressionBlock { blockType, name, content, children }) a
                     in
                     case Dict.get name_ blockDict of
                         Just f ->
-                            f settings args (renderExprList settings exprs_)
+                            f settings args (exportExprList settings exprs_)
 
                         Nothing ->
                             if name_ == "defs" then
-                                renderDefs exprs_
+                                renderDefs settings exprs_
 
                             else
-                                environment name_ (renderExprList settings exprs_)
+                                environment name_ (exportExprList settings exprs_)
 
         VerbatimBlock _ ->
             case content of
@@ -78,8 +79,9 @@ renderBlock settings ((ExpressionBlock { blockType, name, content, children }) a
                     "???"
 
 
-renderDefs exprs =
-    Debug.toString exprs
+renderDefs settings exprs =
+    "%% Macro definitions from L0 text:\n"
+        ++ exportExprList settings exprs
 
 
 
@@ -104,6 +106,7 @@ functionDict =
         , ( "i", "textit" )
         , ( "bold", "textbf" )
         , ( "b", "textbf" )
+        , ( "image", "imagecenter" )
         ]
 
 
@@ -159,6 +162,9 @@ macro1 name arg =
     if name == "math" then
         "$" ++ arg ++ "$"
 
+    else if name == "group" then
+        arg
+
     else
         case Dict.get name functionDict of
             Nothing ->
@@ -168,16 +174,25 @@ macro1 name arg =
                 "\\" ++ realName ++ "{" ++ String.trimLeft arg ++ "}"
 
 
-renderExprList : Settings -> List Expr -> String
-renderExprList settings exprs =
-    List.map (renderExpr settings) exprs |> String.join ""
+exportExprList : Settings -> List Expr -> String
+exportExprList settings exprs =
+    List.map (exportExpr settings) exprs |> String.join ""
 
 
-renderExpr : Settings -> Expr -> String
-renderExpr settings expr =
+exportExpr : Settings -> Expr -> String
+exportExpr settings expr =
     case expr of
-        Expr str exps_ _ ->
-            macro1 str (List.map (renderExpr settings) exps_ |> String.join " ")
+        Expr name exps_ _ ->
+            if name == "lambda" then
+                case Lambda.extract expr of
+                    Just lambda ->
+                        Lambda.toString (exportExpr settings) lambda
+
+                    Nothing ->
+                        "Error extracting lambda"
+
+            else
+                macro1 name (List.map (exportExpr settings) exps_ |> String.join " ")
 
         Text str _ ->
             str

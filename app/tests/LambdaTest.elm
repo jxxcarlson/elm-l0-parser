@@ -61,5 +61,5 @@ suite =
                         |> Maybe.map Simple.simplify
                         |> Expect.equal (Just (ExprS "group" [ ExprS "b" [ TextS " ", ExprS "i" [ TextS " bird" ] ], ExprS "b" [ TextS " ", ExprS "i" [ TextS " flower" ] ] ]))
         , test "toString" <|
-            \_ -> lambda |> Maybe.map (Lambda.toString (Render.LaTeX.renderExpr Render.Settings.defaultSettings)) |> Expect.equal (Just "\\newcommand{bi[1]{\\textbf{\\textit{x}}]")
+            \_ -> lambda |> Maybe.map (Lambda.toString (Render.LaTeX.exportExpr Render.Settings.defaultSettings)) |> Expect.equal (Just "\\newcommand{bi[1]{\\textbf{\\textit{x}}]")
         ]
