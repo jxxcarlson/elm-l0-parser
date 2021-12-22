@@ -1,51 +1,36 @@
-module Data.TestDoc exposing (..)
+module Data.TestDoc exposing (text)
 
 
-t1 =
+textDoc =
+    """
+| title
+LO Text LaTeX Export
+
+
+| heading 1
+Introduction
+
+This is [italic a test].
+
+
+"""
+
+
+text1 =
     """Note that inline elements can [i [b be composed.]] That was italic
 bold. Let's not be boring: we can also do colors:
 [blue blue stuff] and [red red stuff].  Of course, colors compose also: [i  [b [red Merry Christmas!]]]
 """
 
 
-t11 =
-    """Note that inline elements can [i [b be composed.]] That was italic"""
-
-
-t12 =
-    """bold. Let's not be boring: we can also do colors:"""
-
-
-t13 =
-    """[blue blue stuff] and [red red stuff].  Of course, colors compose also: [i  [b [red Merry Christmas!]]]"""
-
-
-text1 =
-    """
-one
-  two
-    three!
-    aaaaa
-    b
-"""
-
-
 text =
     """
-
 
 | title
 L0 Examples
 
 
-
-
-
-
-
 The examples are illustrative, not exhaustive.
-
-
 
 | defs
 [lambda bi x [blue [i x]]]
@@ -140,49 +125,6 @@ violets are [blue blue]
 
   | indent
   Хватит этого!
-
-
-
-
-
-| heading 1
-Handling Errors
-
-| heading 2
-Inline errors
-
-This line will have an [i incomplete italic element.
-
-This line does not have a closing bracket: [blue blue sky
-
-This line has too many right brackets: [blue blue sky]]
-
-Here is an incomplete math element: $ a^2 + b^2 = c^2 . [i Oops!
-I forgot a closing dollar sign. Bad!!]
-
-
-| heading 2
-Block errors
-
-[i An unknown block name:]
-
-|| foo bar
-la di dah
-do day!
-
-[i An incomplete block name:]
-
-| inden
-Pythagoras said that if $a$, $b$, $c$ are the altitude, base, and
-hypotenuse of a right triangle, then $a^2 + b^2 = c^2$.
-
-[i A missing block name:
-
-|
-Pythagoras said that if $a$, $b$, $c$ are the altitude, base, and
-hypotenuse of a right triangle, then $a^2 + b^2 = c^2$.
-
-
 
 
 

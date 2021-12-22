@@ -16,8 +16,9 @@ import L0
 import Process
 import Render.Acc as RenderAccumulator
 import Render.L0
+import Render.LaTeX as LaTeX
 import Render.Msg exposing (L0Msg)
-import Render.Settings exposing (Settings)
+import Render.Settings as Settings exposing (Settings)
 import Render.TOC
 import Task exposing (Task)
 
@@ -67,6 +68,7 @@ type Msg
     | InputSearch String
     | Search
     | ClearText
+    | ExportLaTeX
     | LoadDocumentText String
     | IncrementCounter
     | SetViewMode ViewMode
@@ -156,6 +158,16 @@ update msg model =
                 _ ->
                     ( model, Cmd.none )
 
+        ExportLaTeX ->
+            let
+                textToExport =
+                    LaTeX.export Settings.defaultSettings model.ast
+
+                fileName =
+                    "doc.tex"
+            in
+            ( model, Download.string fileName "application/x-latex" textToExport )
+
         SetViewPortForElement result ->
             case result of
                 Ok ( element, viewport ) ->
@@ -219,7 +231,7 @@ mainColumn model =
               column [ height (panelHeight model), spacing 12 ]
                 [ row [ spacing 12 ] [ editor model, rhs model ]
                 ]
-            , row [ Element.paddingXY 8 0, Element.height (px 30), Element.width fill, Font.size 14, Background.color (Element.rgb 0.3 0.3 0.3), Font.color (Element.rgb 1 1 1) ] [ Element.text model.message ]
+            , row [ Element.paddingXY 8 0, Element.height (px 30), Element.width fill, Font.size 14, Background.color (Element.rgb 0.3 0.3 0.3), Font.color (Element.rgb 1 1 1) ] [ exportLaTeXButton, Element.text model.message ]
             ]
         ]
 
@@ -380,7 +392,7 @@ renderedText model =
         , htmlId "__RENDERED_TEXT__"
         , Background.color (Element.rgb255 255 255 255)
         ]
-        ((Render.TOC.view model.count Render.Settings.defaultSettings model.ast |> Element.map Render) :: render model.ast model.count)
+        ((Render.TOC.view model.count Settings.defaultSettings model.ast |> Element.map Render) :: render model.ast model.count)
 
 
 render1 : String -> Int -> List (Element Msg)
@@ -436,6 +448,14 @@ clearTextButton =
     Input.button buttonStyle2
         { onPress = Just ClearText
         , label = el [ centerX, centerY, Font.size 14 ] (text "Clear")
+        }
+
+
+exportLaTeXButton : Element Msg
+exportLaTeXButton =
+    Input.button buttonStyle2
+        { onPress = Just ExportLaTeX
+        , label = el [ centerX, centerY, Font.size 14 ] (text "Export LaTeX")
         }
 
 

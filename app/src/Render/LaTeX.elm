@@ -1,7 +1,9 @@
-module Render.LaTeX exposing (export)
+module Render.LaTeX exposing (export, rawExport)
 
+import Dict exposing (Dict)
 import Either exposing (Either(..))
 import L0 exposing (SyntaxTree)
+import List.Extra
 import Parser.Block exposing (BlockType(..), ExpressionBlock(..))
 import Parser.Expr exposing (Expr(..))
 import Render.Settings exposing (Settings)
@@ -10,11 +12,15 @@ import Tree exposing (Tree)
 
 export : Settings -> SyntaxTree -> String
 export settings ast =
+    preamble "James Carlson" "Whatever" "Today" ++ "\n\n" ++ rawExport settings ast ++ "\n\n\\end{document}\n"
+
+
+rawExport : Settings -> SyntaxTree -> String
+rawExport settings ast =
     ast
         |> List.map (Tree.map (renderBlock settings))
         |> List.map unravel
         |> String.join "\n\n"
-        |> (\body -> preamble "James Carlson" "Whatever" "Today" ++ "\n\n" ++ body ++ "\n\n\\end{document}\n")
 
 
 renderBlock : Settings -> ExpressionBlock -> String
@@ -34,25 +40,114 @@ renderBlock settings ((ExpressionBlock { blockType, name, content, children }) a
                     ""
 
                 Right exprs_ ->
-                    "| " ++ (name |> Maybe.withDefault "NAME NOT GIVEN") ++ "\n" ++ renderExprList settings exprs_
+                    let
+                        name_ =
+                            name |> Maybe.withDefault "anon"
+                    in
+                    case Dict.get name_ blockDict of
+                        Just f ->
+                            f settings args (renderExprList settings exprs_)
 
-        VerbatimBlock args ->
+                        Nothing ->
+                            environment name_ (renderExprList settings exprs_)
+
+        VerbatimBlock _ ->
             case content of
                 Left str ->
-                    "|| " ++ (name |> Maybe.withDefault "NAME NOT GIVEN") ++ "\n" ++ str
+                    case name of
+                        Nothing ->
+                            environment "anon" str
+
+                        Just name1 ->
+                            if name1 == "$$" || name1 == "math" then
+                                [ "$$", str, "$$" ] |> String.join "\n"
+
+                            else
+                                case Dict.get name1 blockNames of
+                                    Nothing ->
+                                        environment "anon" str
+
+                                    Just name2 ->
+                                        environment name2 str
 
                 Right exprs_ ->
-                    ""
+                    "???"
+
+
+blockDict : Dict String (Settings -> List String -> String -> String)
+blockDict =
+    Dict.fromList
+        [ ( "title", \sett args body -> macro1 (firstArg args) body )
+        , ( "subtitle", \sett args body -> macro1 (firstArg args) body )
+        , ( "author", \sett args body -> macro1 (firstArg args) body )
+        , ( "date", \sett args body -> macro1 (firstArg args) body )
+        , ( "heading", \sett args body -> heading args body )
+        ]
+
+
+heading : List String -> String -> String
+heading args body =
+    case secondArg args of
+        "1" ->
+            macro1 "section" body
+
+        "2" ->
+            macro1 "subsection" body
+
+        "3" ->
+            macro1 "subsubsection" body
+
+        _ ->
+            macro1 "subheading" body
+
+
+firstArg : List String -> String
+firstArg args =
+    case List.head args of
+        Nothing ->
+            "Error: expecting something here"
+
+        Just arg ->
+            arg
+
+
+secondArg : List String -> String
+secondArg args =
+    case List.Extra.getAt 1 args of
+        Nothing ->
+            "Error: expecting something here"
+
+        Just arg ->
+            arg
 
 
 macro1 : String -> String -> String
 macro1 name arg =
-    "\\" ++ name ++ "{" ++ arg ++ "}"
+    if name == "math" then
+        "$" ++ arg ++ "$"
+
+    else
+        case Dict.get name functionDict of
+            Nothing ->
+                "\\" ++ name ++ "{" ++ String.trimLeft arg ++ "}"
+
+            Just realName ->
+                "\\" ++ realName ++ "{" ++ String.trimLeft arg ++ "}"
+
+
+functionDict : Dict String String
+functionDict =
+    Dict.fromList
+        [ ( "italic", "textit" )
+        , ( "i", "textit" )
+        , ( "bold", "textbf" )
+        , ( "b", "textbf" )
+        ]
 
 
 renderExprList : Settings -> List Expr -> String
 renderExprList settings exprs =
-    List.map (renderExpr settings) exprs |> String.join " "
+    List.map (renderExpr settings) exprs |> String.join ""
 
 
 renderExpr : Settings -> Expr -> String
@@ -64,11 +159,31 @@ renderExpr settings expr =
         Text str _ ->
             str
 
-        Verbatim a b _ ->
-            "Verbatim not implemented"
+        Verbatim name body _ ->
+            renderVerbatim name body
 
         Error err ->
             "error: " ++ err
+
+
+renderVerbatim name body =
+    case Dict.get name verbatimExprDict of
+        Nothing ->
+            macro1 name body
+
+        Just macroName ->
+            macro1 macroName body
+
+
+verbatimExprDict =
+    Dict.empty
+
+
+blockNames : Dict String String
+blockNames =
+    Dict.fromList
+        [ ( "code", "verbatim" )
+        ]
 
 
 {-| Comment on this!
@@ -88,6 +203,22 @@ unravel tree =
 
 indentString s =
     "  " ++ s
+
+
+
+-- HELPERS
+
+
+tagged name body =
+    "\\" ++ name ++ "{" ++ body ++ "}"
+
+
+environment name body =
+    [ tagged "begin" name, body, tagged "end" name ] |> String.join "\n"
+
+
+
+-- PREAMBLE
 
 
 preamble : String -> String -> String -> String
