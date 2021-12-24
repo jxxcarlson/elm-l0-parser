@@ -1,29 +1,26 @@
 module Data.TestDoc exposing (text)
 
 
-textDoc =
+text =
     """
+
 | title
-LO Text LaTeX Export
+L0 Examples
+
+| item
+Beer
+
+| item
+Pretzels
 
 
-| heading 1
-Introduction
 
-This is [italic a test].
-
+The examples are illustrative, not exhaustive.
 
 """
 
 
 text1 =
-    """Note that inline elements can [i [b be composed.]] That was italic
-bold. Let's not be boring: we can also do colors:
-[blue blue stuff] and [red red stuff].  Of course, colors compose also: [i  [b [red Merry Christmas!]]]
-"""
-
-
-text =
     """
 
 | title
