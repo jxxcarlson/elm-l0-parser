@@ -4,18 +4,20 @@ module Data.TestDoc exposing (text)
 text =
     """
 
+
 | title
 L0 Examples
 
-| item
+| numbered
 Beer
 
-| item
+| numbered
 Pretzels
 
 
 
 The examples are illustrative, not exhaustive.
+
 
 """
 
