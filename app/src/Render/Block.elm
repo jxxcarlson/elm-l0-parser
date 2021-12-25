@@ -159,7 +159,7 @@ heading count settings args id exprs =
                     renderWithDefault "| heading" count settings exprs
 
                 _ ->
-                    sectionNumber :: renderWithDefault "| heading" count settings exprs
+                    sectionNumber :: renderWithDefault "| heading" count settings (Debug.log "EXPRS" exprs)
     in
     Element.link
         [ Font.size fontSize
