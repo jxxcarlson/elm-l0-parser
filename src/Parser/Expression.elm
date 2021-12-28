@@ -244,6 +244,7 @@ eval tokens =
                 [ Expr name (evalList (List.drop 1 args)) meta ]
 
             Nothing ->
+                -- this happens with input of "[]"
                 [ errorMessage "[ ](1)?" ]
 
             _ ->
@@ -355,7 +356,7 @@ recoverFromError state =
         (LB _) :: (S fName meta) :: rest ->
             Loop
                 { state
-                    | committed = errorMessage ("[" ++ fName ++ errorSuffix rest) :: state.committed
+                    | committed = errorMessage (errorSuffix rest) :: errorMessage2 ("[" ++ fName) :: state.committed
                     , stack = []
                     , tokenIndex = meta.index + 1
                     , messages = "Missing right bracket" :: state.messages
@@ -368,7 +369,7 @@ recoverFromError state =
                     | committed = errorMessage "[ - delete space after this bracket " :: state.committed
                     , stack = []
                     , tokenIndex = meta.index + 1
-                    , messages = "You need to have a space after the '|'" :: state.messages
+                    , messages = "You need to have a space after the left bracket" :: state.messages
                 }
 
         -- left bracket with nothing after it.
