@@ -1,28 +1,18 @@
 module Data.TestDoc exposing (text)
 
 
-text11 =
+text =
     """
 
 
 | title
-L0 Examples
-
-| numbered
-Beer
-
-| numbered
-Pretzels
-
-
-
-The examples are illustrative, not exhaustive.
+TESTS
 
 
 """
 
 
-text =
+text22 =
     """
 | title
 L0 Technical Notes

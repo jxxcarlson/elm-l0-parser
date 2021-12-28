@@ -199,8 +199,14 @@ reduceState state =
     if M.reducible symbols then
         case List.head symbols of
             Just L ->
-                { state | stack = [], committed = eval (state.stack |> List.reverse) ++ state.committed }
+                case eval (state.stack |> List.reverse) of
+                    (Expr "invisible" [ Text message _ ] _) :: rest ->
+                        { state | stack = [], committed = rest ++ state.committed, messages = prependMessage message state.messages }
 
+                    whatever ->
+                        { state | stack = [], committed = whatever ++ state.committed }
+
+            -- { state | stack = [], committed = eval (state.stack |> List.reverse) ++ state.committed }
             Just M ->
                 { state | stack = [], committed = Verbatim "math" (Token.toString <| unbracket <| List.reverse state.stack) { begin = 0, end = 0, index = 0 } :: state.committed }
 
@@ -245,10 +251,10 @@ eval tokens =
 
             Nothing ->
                 -- this happens with input of "[]"
-                [ errorMessage "[ ](1)?" ]
+                [ errorMessageInvisible "[ ] is illegal - put something between the brackets", errorMessage "[??]" ]
 
             _ ->
-                [ errorMessage <| "[" ++ Token.toString args ++ "](2) ?" ]
+                [ errorMessageInvisible "[  or [   ] is illegal, try [something ...]", errorMessage <| "[" ++ Token.toString args ++ "?? ]" ]
 
     else
         []
@@ -262,7 +268,7 @@ evalList tokens =
                 TLB ->
                     case M.match (Symbol.convertTokens2 tokens) of
                         Nothing ->
-                            [ Text "error on match" dummyLoc ]
+                            [ errorMessageInvisible "Error on match", Text "error on match" dummyLoc ]
 
                         Just k ->
                             let
@@ -277,10 +283,15 @@ evalList tokens =
                             expr :: evalList (List.drop 1 tokens)
 
                         Nothing ->
-                            [ Text "error converting Token" dummyLoc ]
+                            [ errorMessageInvisible "Error converting token", Text "error converting Token" dummyLoc ]
 
         _ ->
             []
+
+
+errorMessageInvisible : String -> Expr
+errorMessageInvisible message =
+    Expr "invisible" [ Text message dummyLoc ] dummyLoc
 
 
 errorMessage : String -> Expr
@@ -329,6 +340,20 @@ isReducible tokens =
     tokens |> List.reverse |> Symbol.convertTokens |> M.reducible
 
 
+prependMessage : String -> List String -> List String
+prependMessage message messages =
+    case messages of
+        first :: rest ->
+            if message == first then
+                messages
+
+            else
+                message :: messages
+
+        _ ->
+            message :: messages
+
+
 recoverFromError : State -> Step State State
 recoverFromError state =
     case List.reverse state.stack of
@@ -339,7 +364,7 @@ recoverFromError state =
                     | committed = errorMessage "[?]" :: state.committed
                     , stack = []
                     , tokenIndex = meta.index + 1
-                    , messages = "Brackets need to enclose something" :: state.messages
+                    , messages = prependMessage "Brackets need to enclose something" state.messages
                 }
 
         -- consecutive left brackets
@@ -349,30 +374,30 @@ recoverFromError state =
                     | committed = errorMessage "[" :: state.committed
                     , stack = []
                     , tokenIndex = meta.index
-                    , messages = "You have consecutive left brackets" :: state.messages
+                    , messages = prependMessage "You have consecutive left brackets" state.messages
                 }
 
-        -- missing right bracket
+        -- missing right bracket // OK
         (LB _) :: (S fName meta) :: rest ->
             Loop
                 { state
                     | committed = errorMessage (errorSuffix rest) :: errorMessage2 ("[" ++ fName) :: state.committed
                     , stack = []
                     , tokenIndex = meta.index + 1
-                    , messages = "Missing right bracket" :: state.messages
+                    , messages = prependMessage "Missing right bracket" state.messages
                 }
 
-        -- space after left bracket
+        -- space after left bracket // OK
         (LB _) :: (W " " meta) :: rest ->
             Loop
                 { state
-                    | committed = errorMessage "[ - delete space after this bracket " :: state.committed
+                    | committed = errorMessage "[ - can't have space after the bracket " :: state.committed
                     , stack = []
                     , tokenIndex = meta.index + 1
-                    , messages = "You need to have a space after the left bracket" :: state.messages
+                    , messages = prependMessage "Can't have space after left bracket - try [something ..." state.messages
                 }
 
-        -- left bracket with nothing after it.
+        -- left bracket with nothing after it.  // OK
         (LB _) :: [] ->
             Done
                 { state
@@ -380,7 +405,7 @@ recoverFromError state =
                     , stack = []
                     , tokenIndex = 0
                     , numberOfTokens = 0
-                    , messages = "That left bracket needs something after it" :: state.messages
+                    , messages = prependMessage "That left bracket needs something after it" state.messages
                 }
 
         -- extra right bracket
@@ -390,7 +415,7 @@ recoverFromError state =
                     | committed = errorMessage " extra ]?" :: state.committed
                     , stack = []
                     , tokenIndex = meta.index + 1
-                    , messages = "Extra right bracket(s)" :: state.messages
+                    , messages = prependMessage "Extra right bracket(s)" state.messages
                 }
 
         -- dollar sign with no closing dollar sign
@@ -412,7 +437,7 @@ recoverFromError state =
                     , stack = []
                     , tokenIndex = meta.index + 1
                     , numberOfTokens = 0
-                    , messages = "opening dollar sign needs to be matched with a closing one" :: state.messages
+                    , messages = prependMessage "opening dollar sign needs to be matched with a closing one" state.messages
                 }
 
         -- backtick with no closing backtick
@@ -434,7 +459,7 @@ recoverFromError state =
                     , stack = []
                     , tokenIndex = meta.index + 1
                     , numberOfTokens = 0
-                    , messages = "opening backtick needs to be matched with a closing one" :: state.messages
+                    , messages = prependMessage "opening backtick needs to be matched with a closing one" state.messages
                 }
 
         _ ->
@@ -477,7 +502,7 @@ recoverFromError1 state =
                         , tokenIndex = 0
                         , numberOfTokens = List.length newStack
                         , committed = errorMessage "[" :: state.committed
-                        , messages = ("Unmatched brackets: added " ++ String.fromInt k ++ " right brackets") :: state.messages
+                        , messages = prependMessage ("Unmatched brackets: added " ++ String.fromInt k ++ " right brackets") state.messages
                     }
 
     else
@@ -487,7 +512,7 @@ recoverFromError1 state =
                     bracketError k
                         -- :: Expr "blue" [ Text (" " ++ Token.toString state.tokens) dummyLoc ] dummyLoc
                         :: state.committed
-                , messages = bracketErrorAsString k :: state.messages
+                , messages = prependMessage (bracketErrorAsString k) state.messages
             }
 
 
