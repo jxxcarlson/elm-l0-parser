@@ -16,11 +16,10 @@ idemTest input =
 
 suite : Test
 suite =
-    Test.only <|
-        describe "Parser.Token"
-            [ idemTest "a b c [x y z]"
-            , idemTest "a b c [x [y z]]"
-            , idemTest "a [b c] [x [y z]]"
-            , idemTest "a $b c$ [x [y z]]"
-            , idemTest "a `b c`  [x [y z]]"
-            ]
+    describe "Parser.Token"
+        [ idemTest "a b c [x y z]"
+        , idemTest "a b c [x [y z]]"
+        , idemTest "a [b c] [x [y z]]"
+        , idemTest "a $b c$ [x [y z]]"
+        , idemTest "a `b c`  [x [y z]]"
+        ]

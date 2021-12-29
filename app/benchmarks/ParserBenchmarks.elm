@@ -1,13 +1,15 @@
 module ParserBenchmarks exposing (suite)
 
-import Array
 import Benchmark exposing (..)
 import Diff
 import L0
+import Parser.Block exposing (IntermediateBlock)
 import Parser.BlockUtil
 import Render.L0
 import Render.Settings
+import Tree exposing (Tree)
 import Tree.BlocksV
+import Tree.Diff
 
 
 suite : Benchmark
@@ -23,17 +25,29 @@ suite =
         blocks2 : List Tree.BlocksV.Block
         blocks2 =
             Tree.BlocksV.fromStringAsParagraphs isVerbatimLine ex4
+
+        forest1 : List (Tree IntermediateBlock)
+        forest1 =
+            L0.parseToIntermediate ex3
+
+        forest2 : List (Tree IntermediateBlock)
+        forest2 =
+            L0.parseToIntermediate ex4
     in
     describe "L0.parse"
-        [ --benchmark "ex3" <|
-          --  \_ -> L0.parse ex3
+        [ -- benchmark "ex3" <|
+          --    \_ -> L0.parse ex3
           --benchmark "render" <|
           --  \_ -> Render.L0.renderFromAST 0 Render.Settings.defaultSettings ast
           --benchmark "find blocks" <|
           --  \_ -> Tree.BlocksV.fromStringAsParagraphs isVerbatimLine ex3
           --
-          benchmark "diff" <|
-            \_ -> Diff.diff blocks1 blocks2
+          --benchmark "diff" <|
+          --  \_ -> Diff.diff blocks1 blocks2
+          --benchmark "diff trees" <|
+          --  \_ -> List.map2 Tree.Diff.diff tree1 tree2
+          benchmark "diff forest" <|
+            \_ -> Diff.diff forest1 forest2
         ]
 
 

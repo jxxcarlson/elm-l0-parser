@@ -1,6 +1,6 @@
 module L0 exposing
     ( parse
-    , SyntaxTree, b, bb
+    , SyntaxTree, b, bb, parseToIntermediate
     )
 
 {-| A Parser for the experimental L0 module. See the app folder to see how it is used.

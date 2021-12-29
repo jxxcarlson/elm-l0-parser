@@ -12,6 +12,7 @@ module Parser.BlockUtil exposing
 
 import Either exposing (Either(..))
 import Parser.Block exposing (BlockType(..), ExpressionBlock(..), IntermediateBlock(..))
+import Parser.Expr exposing (Expr)
 import Parser.Expression
 import Tree.BlocksV
 
@@ -86,7 +87,7 @@ toExpressionBlockFromIntermediateBlock (IntermediateBlock { name, args, indent, 
         , numberOfLines = List.length (String.lines content)
         , id = id
         , blockType = blockType
-        , content = Right (Parser.Expression.parse content)
+        , content = mapContent blockType content
         , messages = messages
         , children = List.map toExpressionBlockFromIntermediateBlock children
         , sourceText = sourceText
@@ -201,6 +202,65 @@ toExpressionBlock block =
                 , children = []
                 , sourceText = block.content
                 }
+
+
+mapContent : BlockType -> String -> Either String (List Expr)
+mapContent blockType content =
+    case blockType of
+        Paragraph ->
+            Right (Parser.Expression.parse content)
+
+        OrdinaryBlock args ->
+            let
+                ( firstLine, rawContent_ ) =
+                    split content
+
+                --messages =
+                --    if rawContent_ == "" then
+                --        ("Write something below the block header (" ++ String.replace "| " "" firstLine ++ ")") :: state.messages
+                --
+                --    else
+                --        state.messages
+                rawContent =
+                    if rawContent_ == "" then
+                        firstLine ++ "\n[red Write something below this block header (" ++ String.replace "| " "" firstLine ++ ")]"
+
+                    else
+                        rawContent_
+            in
+            Right (Parser.Expression.parse content)
+
+        VerbatimBlock args ->
+            let
+                ( firstLine, rawContent ) =
+                    split content
+
+                --messages =
+                --    case blockType of
+                --        VerbatimBlock [ "math" ] ->
+                --            if String.endsWith "$$" rawContent then
+                --                state.messages
+                --
+                --            else
+                --                "You need to close this math expression with '$$'" :: state.messages
+                --
+                --        VerbatimBlock [ "code" ] ->
+                --            if String.endsWith "```" rawContent then
+                --                state.messages
+                --
+                --            else
+                --                "You need to close this code block with triple backticks" :: []
+                --
+                --        _ ->
+                --            state.messages
+                content_ =
+                    if blockType == VerbatimBlock [ "code" ] then
+                        Left (String.replace "```" "" content)
+
+                    else
+                        Left content
+            in
+            content_
 
 
 toIntermediateBlock : Tree.BlocksV.Block -> IntermediateBlock
