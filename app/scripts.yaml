@@ -1,6 +1,6 @@
    scripts:
 
-     make: elm make src/TestMain.elm --output=public/Main.js
+     make: elm make src/Main.elm --output=public/Main.js
 
      optimize: elm make --optimize src/TestMain.elm --output=public/Main.js
 
