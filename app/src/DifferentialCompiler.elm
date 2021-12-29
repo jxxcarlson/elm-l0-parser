@@ -1,4 +1,4 @@
-module DifferentialCompiler exposing (..)
+module DifferentialCompiler exposing (EditRecord, differentialCompiler, init, update)
 
 import Differ
 

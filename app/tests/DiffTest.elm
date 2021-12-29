@@ -1,17 +1,18 @@
 module DiffTest exposing (..)
 
-import Dict exposing (Dict)
 import Differ
+import DifferentialCompiler
+import Element exposing (Element)
 import Expect exposing (Expectation)
-import Fuzz exposing (Fuzzer, int, list, string)
-import Parser.Expr exposing (Expr(..))
-import Parser.Expression as Expression
-import Parser.Simple as Simple exposing (ExprS(..))
-import Render.LaTeX
-import Render.Lambda as Lambda exposing (Lambda)
+import L0 exposing (parseToIntermediate)
+import Parser.Block exposing (ExpressionBlock, IntermediateBlock)
+import Parser.BlockUtil
+import Parser.Expr exposing (Expr)
+import Render.Block
+import Render.Msg exposing (L0Msg)
 import Render.Settings
-import Render.Text as Text
 import Test exposing (..)
+import Tree
 
 
 a1 =
@@ -42,6 +43,65 @@ diff1 =
     }
 
 
+t1 =
+    """
+| Intro
+
+| heading 1
+Preliminaries
+
+This [i is a test].
+"""
+
+
+t2 =
+    """
+| Intro
+
+| heading 1
+Preliminaries
+
+This [b is a test].
+"""
+
+
+chunker =
+    parseToIntermediate
+
+
+parser =
+    Tree.map Parser.BlockUtil.toExpressionBlockFromIntermediateBlock
+
+
+renderer =
+    Tree.map (Render.Block.render 0 Render.Settings.defaultSettings)
+
+
+editRecord1 : DifferentialCompiler.EditRecord (Tree.Tree IntermediateBlock) (Tree.Tree ExpressionBlock) (Tree.Tree (Element L0Msg))
+editRecord1 =
+    DifferentialCompiler.init chunker parser renderer t1
+
+
+newEditRecord : DifferentialCompiler.EditRecord (Tree.Tree IntermediateBlock) (Tree.Tree ExpressionBlock) (Tree.Tree (Element L0Msg))
+newEditRecord =
+    DifferentialCompiler.init chunker parser renderer t2
+
+
+newRendered : List (Tree.Tree (Element L0Msg))
+newRendered =
+    newEditRecord.rendered
+
+
+editRecord2Rendered : List (Tree.Tree (Element L0Msg))
+editRecord2Rendered =
+    editRecord2.rendered
+
+
+editRecord2 : DifferentialCompiler.EditRecord (Tree.Tree IntermediateBlock) (Tree.Tree ExpressionBlock) (Tree.Tree (Element L0Msg))
+editRecord2 =
+    DifferentialCompiler.update chunker parser renderer editRecord1 t2
+
+
 suite : Test
 suite =
     Test.only <|
@@ -50,4 +110,9 @@ suite =
                 \_ -> Differ.diff a1 b1 |> Expect.equal diff1
             , test "differentialTransform" <|
                 \_ -> Differ.differentialTransform double dR a1x |> Expect.equal [ 2, 20, 6 ]
+
+            --, test "differentialCompiler" <|
+            --    \_ -> Expect.equal newRendered editRecord2Rendered
+            --
+            ---- newEditRecord.rendered editRecord2.rendered
             ]

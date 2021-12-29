@@ -3,6 +3,7 @@ module Main exposing (main)
 import Browser
 import Browser.Dom as Dom
 import Data.TestDoc
+import DifferentialCompiler
 import Element exposing (..)
 import Element.Background as Background
 import Element.Font as Font
@@ -13,14 +14,18 @@ import Html.Attributes as HtmlAttr exposing (attribute)
 import Html.Events exposing (keyCode, on, onClick, onInput)
 import Json.Decode
 import L0
+import Parser.Block exposing (ExpressionBlock, IntermediateBlock)
+import Parser.BlockUtil
 import Process
 import Render.Acc as RenderAccumulator
+import Render.Block
 import Render.L0
 import Render.LaTeX as LaTeX
 import Render.Msg exposing (L0Msg)
 import Render.Settings as Settings exposing (Settings)
 import Render.TOC
 import Task exposing (Task)
+import Tree
 
 
 main =
@@ -35,6 +40,7 @@ main =
 type alias Model =
     { sourceText : String
     , ast : L0.SyntaxTree
+    , editRecord : DifferentialCompiler.EditRecord (Tree.Tree IntermediateBlock) (Tree.Tree ExpressionBlock) (Tree.Tree (Element L0Msg))
     , count : Int
     , windowHeight : Int
     , windowWidth : Int
@@ -80,10 +86,23 @@ type alias Flags =
     { width : Int, height : Int }
 
 
+chunker =
+    L0.parseToIntermediate
+
+
+parser =
+    Tree.map Parser.BlockUtil.toExpressionBlockFromIntermediateBlock
+
+
+renderer =
+    Tree.map (Render.Block.render 0 Settings.defaultSettings)
+
+
 init : Flags -> ( Model, Cmd Msg )
 init flags =
     ( { sourceText = Data.TestDoc.text
       , ast = L0.parse Data.TestDoc.text |> RenderAccumulator.transformST
+      , editRecord = DifferentialCompiler.init chunker parser renderer Data.TestDoc.text
       , count = 0
       , windowHeight = flags.height
       , windowWidth = flags.width
@@ -122,9 +141,16 @@ update msg model =
             ( { model | viewMode = viewMode }, Cmd.none )
 
         InputText str ->
+            let
+                editRecord =
+                    DifferentialCompiler.update chunker parser renderer model.editRecord str
+            in
             ( { model
                 | sourceText = str
-                , ast = L0.parse str |> RenderAccumulator.transformST
+
+                --, ast = L0.parse str |> RenderAccumulator.transformST
+                , editRecord = editRecord
+                , ast = editRecord.parsed |> RenderAccumulator.transformST
                 , count = model.count + 1
               }
             , Cmd.none
