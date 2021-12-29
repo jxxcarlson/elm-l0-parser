@@ -1,4 +1,4 @@
-module Differ exposing (DiffRecord, diff, differentialTransform)
+module Render.Differ exposing (DiffRecord, diff, differentialTransform)
 
 
 type alias DiffRecord a =

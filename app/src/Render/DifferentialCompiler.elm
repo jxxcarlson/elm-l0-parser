@@ -1,6 +1,6 @@
-module DifferentialCompiler exposing (EditRecord, differentialCompiler, init, update)
+module Render.DifferentialCompiler exposing (EditRecord, differentialCompiler, init, update)
 
-import Differ
+import Render.Differ as Differ
 
 
 type alias EditRecord chunk parsedChunk renderedChunk =
