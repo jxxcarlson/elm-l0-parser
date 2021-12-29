@@ -1,9 +1,9 @@
    scripts:
 
-     make: elm make src/Main.elm --output=public/Main.js
+     make: elm make src/TestMain.elm --output=public/Main.js
 
-     optimize: elm make --optimize src/Main.elm --output=public/Main.js
+     optimize: elm make --optimize src/TestMain.elm --output=public/Main.js
 
-     live:  npx elm-live src/Main.elm -- --output Main.js
+     live:  npx elm-live src/TestMain.elm -- --output Main.js
 
      loc: cloc --by-file src/Render

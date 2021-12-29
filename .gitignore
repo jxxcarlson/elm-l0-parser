@@ -4,3 +4,4 @@ node_modules/
 app/public/Main.js
 stat.txt
 app/Main.js
+app/benchmarks/index.html
