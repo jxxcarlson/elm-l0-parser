@@ -1,7 +1,7 @@
-module Data.TestDoc exposing (example1, text)
+module Data.TestDoc exposing (ex1, text)
 
 
-text =
+ex1 =
     """
 
 
@@ -12,7 +12,7 @@ TESTS
 """
 
 
-example1 =
+text =
     """
 | title
 L0 Technical Notes
