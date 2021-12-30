@@ -334,10 +334,6 @@ blockDict =
 
 heading : List String -> String -> String
 heading args body =
-    let
-        _ =
-            Debug.log "args" args
-    in
     case Utility.getArg "4" 1 args of
         "1" ->
             macro1 "section" body

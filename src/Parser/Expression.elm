@@ -386,10 +386,6 @@ recoverFromError state =
 
         -- left bracket with nothing after it.  // OK
         (LB meta) :: [] ->
-            let
-                _ =
-                    Debug.log "(LB meta)" (LB meta)
-            in
             Done
                 { state
                     | committed = errorMessage "[...?" :: state.committed
