@@ -9,7 +9,7 @@ type alias EditRecord chunk parsedChunk =
     }
 
 
-init : (String -> List chunk) -> (chunk -> parsedChunk) -> String -> EditRecord chunk parsedChunk renderedChunk
+init : (String -> List chunk) -> (chunk -> parsedChunk) -> String -> EditRecord chunk parsedChunk
 init chunker parser text =
     let
         chunks =
