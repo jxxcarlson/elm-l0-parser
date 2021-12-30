@@ -257,7 +257,8 @@ mainColumn model =
               column [ height (panelHeight model), spacing 12 ]
                 [ row [ spacing 12 ] [ editor model, rhs model ]
                 ]
-            , row [ Element.paddingXY 8 0, Element.height (px 30), Element.width fill, Font.size 14, Background.color (Element.rgb 0.3 0.3 0.3), Font.color (Element.rgb 1 1 1) ] [ exportLaTeXButton, Element.text model.message ]
+            , row [ Element.paddingXY 8 0, Element.height (px 30), Element.width fill, Font.size 14, Background.color (Element.rgb 0.3 0.3 0.3), Font.color (Element.rgb 1 1 1) ]
+                [ exportLaTeXButton, Element.text <| "Messages: " ++ model.message ]
             ]
         ]
 
