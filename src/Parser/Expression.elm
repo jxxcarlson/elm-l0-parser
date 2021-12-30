@@ -7,7 +7,7 @@ module Parser.Expression exposing
 import Either exposing (Either(..))
 import List.Extra
 import Parser.Expr exposing (Expr(..))
-import Parser.Helpers as Helpers
+import Parser.Helpers as Helpers exposing (Step(..), loop)
 import Parser.Match as M
 import Parser.Symbol as Symbol exposing (Symbol(..))
 import Parser.Token as Token exposing (Meta, Token(..), TokenType(..))
@@ -543,18 +543,3 @@ dummyLoc =
 
 
 -- LOOP
-
-
-type Step state a
-    = Loop state
-    | Done a
-
-
-loop : state -> (state -> Step state a) -> a
-loop s f =
-    case f s of
-        Loop s_ ->
-            loop s_ f
-
-        Done b ->
-            b
