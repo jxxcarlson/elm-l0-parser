@@ -17,10 +17,10 @@ diffTest label a b expected =
         \_ ->
             let
                 _ =
-                    L0.parseToIntermediate a |> Debug.log "A"
+                    L0.parseToIntermediate a
 
                 _ =
-                    L0.parseToIntermediate b |> Debug.log "B"
+                    L0.parseToIntermediate b
             in
             List.map2 Diff.diff (L0.parseToIntermediate a) (L0.parseToIntermediate b)
                 |> Expect.equal expected
