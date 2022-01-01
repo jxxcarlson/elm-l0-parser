@@ -178,7 +178,7 @@ length token =
 
 init : String -> State a
 init str =
-    { source = str, scanpointer = 0, sourceLength = String.length str, tokens = [], lastToken = Nothing, lastTokenType = Nothing, tokenIndex = 0, mode = Normal }
+    { source = str, scanpointer = 0, sourceLength = String.length str, tokens = [], lastToken = Just (S "" { begin = 0, end = 0, index = 0 }), lastTokenType = Just TS, tokenIndex = 0, mode = Normal }
 
 
 type alias TokenParser =
