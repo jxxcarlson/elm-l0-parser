@@ -178,7 +178,7 @@ length token =
 
 init : String -> State a
 init str =
-    { source = str, scanpointer = 0, sourceLength = String.length str, tokens = [], lastToken = Just (S "" { begin = 0, end = 0, index = 0 }), lastTokenType = Just TS, tokenIndex = 0, mode = Normal }
+    { source = str, scanpointer = 0, sourceLength = String.length str, tokens = [], lastToken = Just (S "" { begin = 0, end = 0, index = 0 }), lastTokenType = Just TW, tokenIndex = 0, mode = Normal }
 
 
 type alias TokenParser =
@@ -210,6 +210,16 @@ get state start input =
 
 nextStep : State Token -> Step (State Token) (List Token)
 nextStep state =
+    let
+        _ =
+            Debug.log (String.fromInt state.tokenIndex) "----------------"
+
+        _ =
+            Debug.log "(lastTokenType, lastToken)" ( state.lastTokenType, state.lastToken )
+
+        _ =
+            Debug.log "tokens" state.tokens
+    in
     if state.scanpointer >= state.sourceLength then
         Done state.tokens
 
@@ -284,7 +294,7 @@ mergeTokensAux lastToken currentToken =
             getMeta currentToken
 
         meta =
-            { begin = lastTokenMeta.begin, end = currentTokenMeta.end, index = currentTokenMeta.index }
+            { begin = lastTokenMeta.begin, end = currentTokenMeta.end, index = lastTokenMeta.index }
     in
     S (stringValue lastToken ++ stringValue currentToken) meta
 
