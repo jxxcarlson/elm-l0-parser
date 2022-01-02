@@ -1,7 +1,5 @@
 module DiffTest exposing (..)
 
-import Differ
-import DifferentialCompiler
 import Element exposing (Element)
 import Expect exposing (Expectation)
 import L0 exposing (parseToIntermediate)
@@ -9,6 +7,8 @@ import Parser.Block exposing (ExpressionBlock, IntermediateBlock)
 import Parser.BlockUtil
 import Parser.Expr exposing (Expr)
 import Render.Block
+import Render.Differ as Differ
+import Render.DifferentialCompiler as DifferentialCompiler
 import Render.Msg exposing (L0Msg)
 import Render.Settings
 import Test exposing (..)
