@@ -311,7 +311,7 @@ updateCurrentToken index token currentToken =
             Just (setIndex index token)
 
         Just token_ ->
-            Just <| setIndex index (mergeTokensAux token_ token)
+            Just <| setIndex index (mergeToken token_ token)
 
 
 isTextToken : Token -> Bool
@@ -324,22 +324,8 @@ type MergeStatus
     | TokensMerged
 
 
-mergeTokens : Maybe Token -> Token -> ( Token, MergeStatus )
-mergeTokens lastToken_ token =
-    case lastToken_ of
-        Nothing ->
-            ( token, TokensUnchanged )
-
-        Just lastToken ->
-            if isTextToken lastToken && isTextToken token then
-                ( mergeTokensAux lastToken token, TokensMerged )
-
-            else
-                ( token, TokensUnchanged )
-
-
-mergeTokensAux : Token -> Token -> Token
-mergeTokensAux lastToken currentToken =
+mergeToken : Token -> Token -> Token
+mergeToken lastToken currentToken =
     let
         lastTokenMeta =
             getMeta lastToken
