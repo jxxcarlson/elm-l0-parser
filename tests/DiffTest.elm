@@ -17,12 +17,12 @@ diffTest label a b expected =
         \_ ->
             let
                 _ =
-                    L0.parseToIntermediate a
+                    L0.parseToIntermediateBlocks a
 
                 _ =
-                    L0.parseToIntermediate b
+                    L0.parseToIntermediateBlocks b
             in
-            List.map2 Diff.diff (L0.parseToIntermediate a) (L0.parseToIntermediate b)
+            List.map2 Diff.diff (L0.parseToIntermediateBlocks a) (L0.parseToIntermediateBlocks b)
                 |> Expect.equal expected
 
 

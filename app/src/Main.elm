@@ -87,7 +87,7 @@ type alias Flags =
 
 
 chunker =
-    L0.parseToIntermediate
+    L0.parseToIntermediateBlocks
 
 
 parser =

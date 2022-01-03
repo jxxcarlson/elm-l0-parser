@@ -2,7 +2,7 @@ module DiffTest exposing (..)
 
 import Element exposing (Element)
 import Expect exposing (Expectation)
-import L0 exposing (parseToIntermediate)
+import L0 exposing (parseToIntermediateBlocks)
 import Parser.Block exposing (ExpressionBlock, IntermediateBlock)
 import Parser.BlockUtil
 import Parser.Expr exposing (Expr)
@@ -66,7 +66,7 @@ This [b is a test].
 
 
 chunker =
-    parseToIntermediate
+    parseToIntermediateBlocks
 
 
 parser =

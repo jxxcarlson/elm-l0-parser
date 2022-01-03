@@ -28,11 +28,11 @@ suite =
 
         forest1 : List (Tree IntermediateBlock)
         forest1 =
-            L0.parseToIntermediate ex3
+            L0.parseToIntermediateBlocks ex3
 
         forest2 : List (Tree IntermediateBlock)
         forest2 =
-            L0.parseToIntermediate ex4
+            L0.parseToIntermediateBlocks ex4
     in
     describe "L0.parse"
         [ -- benchmark "ex3" <|
