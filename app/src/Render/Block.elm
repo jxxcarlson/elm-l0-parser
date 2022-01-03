@@ -129,8 +129,7 @@ verbatimDict =
     Dict.fromList
         [ ( "math", renderDisplayMath )
         , ( "equation", equation )
-
-        --  , ( "align", align )
+        , ( "aligned", aligned )
         , ( "code", renderCode )
         ]
 
@@ -139,6 +138,18 @@ equation : Int -> Settings -> List String -> String -> String -> Element L0Msg
 equation count settings args id str =
     Element.row [ Element.width (Element.px settings.width) ]
         [ Element.el [ Element.centerX ] (renderDisplayMath count settings args id str)
+        , Element.el [ Element.alignRight, Font.size 12, equationLabelPadding ] (Element.text <| "(" ++ Render.Utility.getArg "??" 0 args ++ ")")
+        ]
+
+
+aligned : Int -> Settings -> List String -> String -> String -> Element L0Msg
+aligned count settings args id str =
+    let
+        content =
+            "\\begin{aligned}\n" ++ str ++ "\n\\end{aligned}"
+    in
+    Element.row [ Element.width (Element.px settings.width) ]
+        [ Element.el [ Element.centerX ] (renderDisplayMath count settings args id content)
         , Element.el [ Element.alignRight, Font.size 12, equationLabelPadding ] (Element.text <| "(" ++ Render.Utility.getArg "??" 0 args ++ ")")
         ]
 

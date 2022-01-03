@@ -113,6 +113,21 @@ transformBlock acc ((ExpressionBlock { args, blockType, children, content, messa
                 , sourceText = sourceText
                 }
 
+        VerbatimBlock [ "aligned" ] ->
+            ExpressionBlock
+                { args = args ++ [ String.fromInt acc.equationIndex ]
+                , blockType = blockType
+                , children = children
+                , content = content
+                , messages = messages
+                , indent = indent
+                , lineNumber = lineNumber
+                , numberOfLines = numberOfLines
+                , name = name
+                , id = id
+                , sourceText = sourceText
+                }
+
         _ ->
             expand acc.environment block
 
@@ -155,6 +170,13 @@ updateAccumulator ((ExpressionBlock { blockType, content }) as block) accumulato
 
         -- provide for numbering of equations
         VerbatimBlock [ "equation" ] ->
+            let
+                equationIndex =
+                    accumulator.equationIndex + 1
+            in
+            { accumulator | equationIndex = equationIndex }
+
+        VerbatimBlock [ "aligned" ] ->
             let
                 equationIndex =
                     accumulator.equationIndex + 1
