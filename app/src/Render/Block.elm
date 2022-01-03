@@ -95,6 +95,10 @@ noSuchOrdinaryBlock count settings functionName exprs =
         ]
 
 
+
+-- DICT
+
+
 blockDict : Dict String (Int -> Settings -> List String -> String -> List Expr -> Element L0Msg)
 blockDict =
     Dict.fromList
@@ -124,8 +128,23 @@ verbatimDict : Dict String (Int -> Settings -> List String -> String -> String -
 verbatimDict =
     Dict.fromList
         [ ( "math", renderDisplayMath )
+        , ( "equation", equation )
+
+        --  , ( "align", align )
         , ( "code", renderCode )
         ]
+
+
+equation : Int -> Settings -> List String -> String -> String -> Element L0Msg
+equation count settings args id str =
+    Element.row [ Element.width (Element.px settings.width) ]
+        [ Element.el [ Element.centerX ] (renderDisplayMath count settings args id str)
+        , Element.el [ Element.alignRight, Font.size 12, equationLabelPadding ] (Element.text <| "(" ++ Render.Utility.getArg "??" 0 args ++ ")")
+        ]
+
+
+equationLabelPadding =
+    Element.paddingEach { left = 0, right = 18, top = 0, bottom = 0 }
 
 
 heading count settings args id exprs =
@@ -207,6 +226,7 @@ env name count settings args id exprs =
         ]
 
 
+renderDisplayMath : Int -> Settings -> List String -> String -> String -> Element L0Msg
 renderDisplayMath count settings args id str =
     let
         w =
@@ -233,10 +253,13 @@ renderDisplayMath count settings args id str =
             (List.map Element.text ("$$" :: List.take (n - 1) lines) ++ [ Element.paragraph [] [ Element.text "$", Element.el [ Font.color Render.Settings.redColor ] (Element.text " - another $?") ] ])
 
     else
-        Element.column [ Events.onClick (SendId id), Font.color Render.Settings.blueColor ]
-            (List.map Element.text ("$$" :: lines) ++ [ Element.el [ Font.color Render.Settings.redColor ] (Element.text "$$??") ])
+        Element.column [ Events.onClick (SendId id) ]
+            -- Element.column [ Events.onClick (SendId id), Font.color Render.Settings.blueColor ]
+            -- (List.map Element.text ("$$" :: lines) ++ [ Element.el [ Font.color Render.Settings.redColor ] (Element.text "$$??") ])
+            [ Render.Math.mathText count w "id" DisplayMathMode (String.join "\n" lines) ]
 
 
+renderCode : Int -> Settings -> List String -> String -> String -> Element L0Msg
 renderCode count settings args id str =
     Element.column
         [ Font.color (Element.rgb255 170 0 250)
