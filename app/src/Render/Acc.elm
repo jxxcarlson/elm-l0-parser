@@ -17,6 +17,11 @@ type alias Accumulator =
     { headingIndex : Vector
     , numberedItemIndex : Int
     , equationIndex : Int
+    , definitionIndex : Int
+    , remarkIndex : Int
+    , lemmaIndex : Int
+    , problemIndex : Int
+    , theoremIndex : Int
     , environment : Dict String Lambda
     }
 
@@ -42,6 +47,11 @@ init k =
     { headingIndex = Vector.init k
     , numberedItemIndex = 0
     , equationIndex = 0
+    , definitionIndex = 0
+    , remarkIndex = 0
+    , lemmaIndex = 0
+    , problemIndex = 0
+    , theoremIndex = 0
     , environment = Dict.empty
     }
 
@@ -66,87 +76,31 @@ transformAccumulateTree tree acc =
 
 
 transformBlock : Accumulator -> ExpressionBlock -> ExpressionBlock
-transformBlock acc ((ExpressionBlock { args, blockType, children, content, messages, indent, lineNumber, numberOfLines, name, id, sourceText }) as block) =
-    case blockType of
+transformBlock acc (ExpressionBlock block) =
+    case block.blockType of
         OrdinaryBlock [ "heading", level ] ->
             ExpressionBlock
-                { args = args ++ [ Vector.toString acc.headingIndex ]
-                , blockType = blockType
-                , children = children
-                , content = content
-                , messages = messages
-                , indent = indent
-                , lineNumber = lineNumber
-                , numberOfLines = numberOfLines
-                , name = name
-                , id = id
-                , sourceText = sourceText
-                }
+                { block | args = block.args ++ [ Vector.toString acc.headingIndex ] }
 
         OrdinaryBlock [ "numbered" ] ->
             ExpressionBlock
-                { args = args ++ [ String.fromInt acc.numberedItemIndex ]
-                , blockType = blockType
-                , children = children
-                , content = content
-                , messages = messages
-                , indent = indent
-                , lineNumber = lineNumber
-                , numberOfLines = numberOfLines
-                , name = name
-                , id = id
-                , sourceText = sourceText
-                }
+                { block | args = block.args ++ [ String.fromInt acc.numberedItemIndex ] }
 
         VerbatimBlock [ "equation" ] ->
             ExpressionBlock
-                { args = args ++ [ String.fromInt acc.equationIndex ]
-                , blockType = blockType
-                , children = children
-                , content = content
-                , messages = messages
-                , indent = indent
-                , lineNumber = lineNumber
-                , numberOfLines = numberOfLines
-                , name = name
-                , id = id
-                , sourceText = sourceText
-                }
+                { block | args = block.args ++ [ String.fromInt acc.equationIndex ] }
 
         VerbatimBlock [ "aligned" ] ->
             ExpressionBlock
-                { args = args ++ [ String.fromInt acc.equationIndex ]
-                , blockType = blockType
-                , children = children
-                , content = content
-                , messages = messages
-                , indent = indent
-                , lineNumber = lineNumber
-                , numberOfLines = numberOfLines
-                , name = name
-                , id = id
-                , sourceText = sourceText
-                }
+                { block | args = block.args ++ [ String.fromInt acc.equationIndex ] }
 
         _ ->
-            expand acc.environment block
+            expand acc.environment (ExpressionBlock block)
 
 
 expand : Dict String Lambda -> ExpressionBlock -> ExpressionBlock
-expand dict ((ExpressionBlock { args, blockType, children, content, messages, indent, lineNumber, numberOfLines, name, id, sourceText }) as block) =
-    ExpressionBlock
-        { args = args
-        , blockType = blockType
-        , children = children
-        , content = Either.map (List.map (Lambda.expand dict)) content
-        , messages = messages
-        , indent = indent
-        , lineNumber = lineNumber
-        , numberOfLines = numberOfLines
-        , name = name
-        , id = id
-        , sourceText = sourceText
-        }
+expand dict (ExpressionBlock block) =
+    ExpressionBlock { block | content = Either.map (List.map (Lambda.expand dict)) block.content }
 
 
 updateAccumulator : ExpressionBlock -> Accumulator -> Accumulator
