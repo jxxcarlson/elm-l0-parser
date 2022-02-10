@@ -86,14 +86,17 @@ type alias Flags =
     { width : Int, height : Int }
 
 
+chunker : String -> List (Tree.Tree IntermediateBlock)
 chunker =
     L0.parseToIntermediateBlocks
 
 
+parser : Tree.Tree IntermediateBlock -> Tree.Tree ExpressionBlock
 parser =
     Tree.map Parser.BlockUtil.toExpressionBlockFromIntermediateBlock
 
 
+renderer : Tree.Tree ExpressionBlock -> Tree.Tree (Element L0Msg)
 renderer =
     Tree.map (Render.Block.render 0 Settings.defaultSettings)
 
