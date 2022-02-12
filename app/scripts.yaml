@@ -1,9 +1,7 @@
    scripts:
 
      make:
-
-        - cp  ../../codemirror/editor.bundle.js public/assets
-        - elm make src/Main.elm --output=public/Main.js
+        - echo "run vr make from ./editor-prepare"
 
      optimize: elm make --optimize src/Main.elm --output=public/Main.js
 
