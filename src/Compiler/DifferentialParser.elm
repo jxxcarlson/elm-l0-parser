@@ -1,4 +1,4 @@
-module Render.DifferentialParser exposing (EditRecord, differentialParser, init, update)
+module Compiler.DifferentialParser exposing (EditRecord, differentialParser, init, update)
 
 import Compiler.Differ as Differ
 

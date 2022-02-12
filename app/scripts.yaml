@@ -7,3 +7,6 @@
      live:  npx elm-live src/TestMain.elm -- --output Main.js
 
      loc: cloc --by-file src/Render
+
+     update-vendor:
+         - cp  ../../codemirror/editor.bundle.js public/assets

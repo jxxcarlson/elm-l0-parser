@@ -1,3 +1,9 @@
 scripts:
 
   loc: cloc --by-file src
+
+  ploc: cloc --by-file src/Parser
+
+  cloc: cloc --by-file src/Compiler
+
+  rloc: cloc --by-file src/Render

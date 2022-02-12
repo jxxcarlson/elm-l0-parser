@@ -2,6 +2,8 @@ module Main exposing (main)
 
 import Browser
 import Browser.Dom as Dom
+import Compiler.Acc as RenderAccumulator
+import Compiler.Differential
 import Data.TestDoc
 import Element exposing (..)
 import Element.Background as Background
@@ -16,9 +18,7 @@ import L0
 import Parser.Block exposing (ExpressionBlock, IntermediateBlock)
 import Parser.BlockUtil
 import Process
-import Render.Acc as RenderAccumulator
 import Render.Block
-import Render.DifferentialCompiler
 import Render.L0
 import Render.LaTeX as LaTeX
 import Render.Msg exposing (L0Msg)
@@ -40,7 +40,7 @@ main =
 type alias Model =
     { sourceText : String
     , ast : L0.SyntaxTree
-    , editRecord : Render.DifferentialCompiler.EditRecord (Tree.Tree IntermediateBlock) (Tree.Tree ExpressionBlock) (Tree.Tree (Element L0Msg))
+    , editRecord : Compiler.Differential.EditRecord (Tree.Tree IntermediateBlock) (Tree.Tree ExpressionBlock) (Tree.Tree (Element L0Msg))
     , count : Int
     , windowHeight : Int
     , windowWidth : Int
@@ -105,7 +105,7 @@ init : Flags -> ( Model, Cmd Msg )
 init flags =
     ( { sourceText = Data.TestDoc.text
       , ast = L0.parse Data.TestDoc.text |> RenderAccumulator.transformST
-      , editRecord = Render.DifferentialCompiler.init chunker parser renderer Data.TestDoc.text
+      , editRecord = Compiler.Differential.init chunker parser renderer Data.TestDoc.text
       , count = 0
       , windowHeight = flags.height
       , windowWidth = flags.width
@@ -146,7 +146,7 @@ update msg model =
         InputText str ->
             let
                 editRecord =
-                    Render.DifferentialCompiler.update chunker parser renderer model.editRecord str
+                    Compiler.Differential.update chunker parser renderer model.editRecord str
             in
             ( { model
                 | sourceText = str
