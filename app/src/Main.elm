@@ -341,7 +341,7 @@ editor_ model =
     in
     el [ htmlAttribute onChange ] <|
         html <|
-            Html.node "ace-editor"
+            Html.node "codemirror-editor"
                 [ HtmlAttr.attribute "theme" "twilight"
                 , HtmlAttr.attribute "wrapmode" "true"
                 , HtmlAttr.attribute "tabsize" "2"
