@@ -296,7 +296,7 @@ appWidth_ =
 
 editor model =
     column [ height (px (innerPanelHeight model)), moveUp 4 ]
-        [ row [ spacing 12 ]
+        [ row [ spacing 12, htmlId "editor-here", width (px 400), Font.size 12 ]
             []
         , editor_ model
         ]
