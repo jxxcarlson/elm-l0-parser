@@ -1,6 +1,7 @@
    scripts:
 
      make:
+
         - cp  ../../codemirror/editor.bundle.js public/assets
         - elm make src/Main.elm --output=public/Main.js
 
