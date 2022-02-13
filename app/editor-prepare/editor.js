@@ -32,59 +32,37 @@ let myTheme = EditorView.theme({
 
 class CodemirrorEditor extends HTMLElement { // (1)
 
+        get editorText() {
+                //return the editor text
+                console.log("Called: editorText()")
+                return this.editor.state.doc.toString()
+            }
 
+        constructor(self) {
 
+            self = super(self)
+            console.log("In constructor")
 
-//                         log: ['a', 'b', 'c'],
-//                           get latest() {
-//                             if (this.log.length === 0) {
-//                               return undefined;
-//                             }
-//                             return this.log[this.log.length - 1];
-//                           }
+            return self
+        }
 
-//       get editorText() {
-//
-//                  return this.editor.state.doc.toString()
-//           }
-
-//      set value(val) {
-//          this.innerHTML = val
-//          this.dispatchEvent(new CustomEvent("change", {detail: this.innerHTML}))
-//      }
-
-
-      // Fires when an instance of the element is created
-//      constructor(self) {
-//
-//        console.log("EDITOR: In constructor")}
-//
-//
-//        self = super(self)
-//
-//
-//
-//        return self;
-//
-//
-//    }
 
     connectedCallback() {
 
+
         console.log("EDITOR: In connectedCallback")
 
+            function sendText(editor) {
 
-        const stx = function setText(str, editor) {
+                // const event = new Event('editorText', { detail: 'ABC'});
+                var text = editor.state.doc.toString()
+                var event = new Event('editorText', { 'detail': text , 'bubbles':true, 'composed': true});
+                document.dispatchEvent(event);
+                console.log("Sent event: ", event)
+                console.log("Text sent", text)
 
-         var currentValue = editor.state.doc.toString();
-         var endPosition = currentValue.length;
+             }
 
-         editor.dispatch({
-           changes: {
-             from: 0,
-             to: endPosition,
-             insert: str}
-         })}
 
 
         let editor = new EditorView({
@@ -92,14 +70,11 @@ class CodemirrorEditor extends HTMLElement { // (1)
               extensions: [basicSetup
                 , fixedHeightEditor
                 , myTheme
+               // , EditorView.updateListener.of(update => console.log( "HOLA:" + editor.state.doc.toString()))
                 , EditorView.lineWrapping
                 , EditorView.updateListener.of((v)=> {
                     if(v.docChanged) {
-                        console.log( editor.state.doc.toString());
-                        stx("Hello!", editor)
-//                        on("change", (event) => {
-//                                        this.dispatchEvent(new CustomEvent("change", { bubbles: true, composed: true, detail: event }))
-//                                        })
+                        sendText(editor)
                     }
                   })
                 ],
@@ -114,6 +89,10 @@ class CodemirrorEditor extends HTMLElement { // (1)
             parent: document.getElementById("editor-here")
 
           })
+
+//          editor.on("change", (event) => {
+//                          element.dispatchEvent(new CustomEvent("change", { bubbles: true, composed: true, detail: event }))
+//                      })
 
     }
 
