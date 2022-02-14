@@ -81,6 +81,7 @@ type Msg
     | SetViewMode ViewMode
     | Render Render.Msg.L0Msg
     | SetViewPortForElement (Result Dom.Error ( Dom.Element, Dom.Viewport ))
+    | Test
 
 
 type alias Flags =
@@ -111,7 +112,7 @@ init flags =
       , windowHeight = flags.height
       , windowWidth = flags.width
       , viewMode = StandardView
-      , message = ""
+      , message = "0"
       , linenumber = 0
       , searchText = ""
       , searchCount = 0
@@ -196,11 +197,11 @@ update msg model =
 
                 fileName =
                     "doc.tex"
-
-                yada =
-                    model.yada + 1
             in
             ( model, Download.string fileName "application/x-latex" textToExport )
+
+        Test ->
+            ( { model | yada = model.yada + 1, message = String.fromInt (model.yada + 1) }, Cmd.none )
 
         SetViewPortForElement result ->
             case result of
@@ -265,8 +266,8 @@ mainColumn model =
               column [ height (panelHeight model), spacing 12 ]
                 [ row [ spacing 12 ] [ editor model, rhs model ]
                 ]
-            , row [ Element.paddingXY 8 0, Element.height (px 30), Element.width fill, Font.size 14, Background.color (Element.rgb 0.3 0.3 0.3), Font.color (Element.rgb 1 1 1) ]
-                [ exportLaTeXButton, Element.text <| "Messages: " ++ model.message ]
+            , row [ Element.spacing 24, Element.paddingXY 8 0, Element.height (px 30), Element.width fill, Font.size 14, Background.color (Element.rgb 0.3 0.3 0.3), Font.color (Element.rgb 1 1 1) ]
+                [ exportLaTeXButton, testButton, Element.text <| "Messages: " ++ model.message ]
             ]
         ]
 
@@ -318,15 +319,21 @@ editor_ : Model -> Element Msg
 editor_ model =
     Element.el
         [ Element.htmlAttribute onTextChange
-        , makeAttribute "text" model.sourceText
-        , makeAttribute "yada" (String.fromInt model.yada)
         , htmlId "editor-here"
         , width (px 550)
         , Background.color (Element.rgb255 0 68 85)
         , Font.color (Element.rgb 0.85 0.85 0.85)
         , Font.size 12
         ]
-        (Element.html (Html.node "codemirror-editor" [] []))
+        (Element.html
+            (Html.node "codemirror-editor"
+                [ HtmlAttr.attribute "id" "the-codemirror-editor"
+                , HtmlAttr.attribute "text" model.sourceText
+                , HtmlAttr.attribute "yada" (String.fromInt model.yada)
+                ]
+                []
+            )
+        )
 
 
 onTextChange : Html.Attribute Msg
@@ -501,6 +508,14 @@ exportLaTeXButton =
     Input.button buttonStyle2
         { onPress = Just ExportLaTeX
         , label = el [ centerX, centerY, Font.size 14 ] (text "Export LaTeX")
+        }
+
+
+testButton : Element Msg
+testButton =
+    Input.button buttonStyle2
+        { onPress = Just Test
+        , label = el [ centerX, centerY, Font.size 14 ] (text "Test")
         }
 
 
