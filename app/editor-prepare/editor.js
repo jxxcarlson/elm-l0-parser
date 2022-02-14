@@ -47,8 +47,12 @@ class CodemirrorEditor extends HTMLElement { // (1)
     }
 
 
-    connectedCallback() {
+//    attributeChangedCallback("yada", "", "foo + bar = foobar") {
+//                     console.log('yada changed to "foobar"');
+//                     // updateStyle(this);
+//                   }
 
+    connectedCallback() {
 
         console.log("CM EDITOR: In connectedCallback")
 
@@ -57,13 +61,25 @@ class CodemirrorEditor extends HTMLElement { // (1)
                 editor.dom.dispatchEvent(event);
              }
 
+            function replaceAllText(editor, str) {
+                const currentValue = editor.state.doc.toString();
+                const endPosition = currentValue.length;
+
+                editor.dispatch({
+                  changes: {
+                    from: 0,
+                    to: endPosition,
+                    insert: str}
+                })
+            }
+
+
 
         let editor = new EditorView({
             state: EditorState.create({
               extensions: [basicSetup
                 , fixedHeightEditor
                 , myTheme
-                // , EditorView.updateListener.of(update => console.log( "HOLA:" + editor.state.doc.toString()))
                 , EditorView.lineWrapping
                 , EditorView.updateListener.of((v)=> {
                     if(v.docChanged) {
@@ -71,7 +87,7 @@ class CodemirrorEditor extends HTMLElement { // (1)
                     }
                   })
                 ],
-            doc: "L0 is simple markup language whose syntax is inspired by Lisp."
+            doc: ""
 
             }),
             parent: document.getElementById("editor-here")

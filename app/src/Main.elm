@@ -308,6 +308,7 @@ editor_ : Model -> Element Msg
 editor_ model =
     Element.el
         [ Element.htmlAttribute onTextChange
+        , HtmlAttr.attribute "text" model.sourceText |> Element.htmlAttribute
         , htmlId "editor-here"
         , width (px 550)
         , Background.color (Element.rgb255 0 68 85)
