@@ -201,7 +201,7 @@ update msg model =
             ( model, Download.string fileName "application/x-latex" textToExport )
 
         Test ->
-            ( { model | yada = model.yada + 1, message = String.fromInt (model.yada + 1) }, Cmd.none )
+            ( { model | sourceText = model.sourceText ++ "\n", message = String.fromInt (model.yada + 1) }, Cmd.none )
 
         SetViewPortForElement result ->
             case result of

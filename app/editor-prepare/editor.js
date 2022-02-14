@@ -32,7 +32,7 @@ let myTheme = EditorView.theme({
 
 class CodemirrorEditor extends HTMLElement {
 
-    static get observedAttributes() { return ['yada']; }
+    static get observedAttributes() { return ['yada', 'text']; }
 
 
 
@@ -56,25 +56,53 @@ class CodemirrorEditor extends HTMLElement {
                 editor.dom.dispatchEvent(event);
              }
 
+         if (this.editor) {
+                    editor = this.editor
+                } else {
+                    const options = {}
+                    // Support autoresizing
+//                    if (this.hasAttribute("max-lines")) {
+//                        options.maxLines = Number(this.getAttribute("max-lines"))
+//                    }
+//                    if (this.hasAttribute("min-lines")) {
+//                        options.minLines = Number(this.getAttribute("min-lines"))
+//                    }
 
-        let editor = new EditorView({
-           state: EditorState.create({
-             extensions: [basicSetup
-               , fixedHeightEditor
-               , myTheme
-               , EditorView.lineWrapping
-               , EditorView.updateListener.of((v)=> {
-                   if(v.docChanged) {
-                       sendText(editor)
-                   }
-                 })
-               ],
-           doc: ""
+                    let editor = new EditorView({
+                               state: EditorState.create({
+                                 extensions: [basicSetup
+                                   , fixedHeightEditor
+                                   , myTheme
+                                   , EditorView.lineWrapping
+                                   , EditorView.updateListener.of((v)=> {
+                                       if(v.docChanged) {
+                                           sendText(editor)
+                                       }
+                                     })
+                                   ],
+                               doc: ""
 
-           }),
-           parent: document.getElementById("editor-here")
+                               }),
+                               parent: document.getElementById("editor-here")
 
-         })
+                             })
+
+                    this.dispatchEvent(new CustomEvent("editor-ready", { bubbles: true, composed: true, detail: editor }))
+                    this.editor = editor
+                    // this.editor.focus = editorFocus
+
+                    // Inject base editor styles
+                   // this.injectTheme("#ace_editor\\.css")
+
+                    // this.editor.setTheme("ace/theme/twilight");  ///
+
+//                    editor.getSession().on("change", (event) => {
+//                        element.dispatchEvent(new CustomEvent("change", { bubbles: true, composed: true, detail: event }))
+//                    })
+
+                }
+
+
 
         console.log("THIS", this)
 
@@ -135,9 +163,9 @@ class CodemirrorEditor extends HTMLElement {
 //                    break
 //
                      case "text":
-                       console.log("EDITOR (2)")
-//                         if (editor.isFocused()) {
-//                              replaceAllText(editor, newVal)
+                          if (this.editor) { replaceAllText(this.editor, newVal); console.log("repaced source with", newVal) }
+                          else {console.log("attr text", "this.editor not defined")}
+
 //                             console.log("SOURCE!!!:", newVal)
 //
 //                         }
