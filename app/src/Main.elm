@@ -294,12 +294,44 @@ appWidth_ =
     2 * panelWidth_ + 15
 
 
+
+-- BEGIN CODE MIRROR EDITOR
+
+
 editor model =
     column [ height (px (innerPanelHeight model)), moveUp 4 ]
-        [ row [ spacing 12, htmlId "editor-here", width (px 550), Background.color (Element.rgb255 0 68 85), Font.color (Element.rgb 0.85 0.85 0.85), Font.size 12 ]
-            []
-        , editor_ model
+        [ editor_ model
         ]
+
+
+editor_ : Model -> Element Msg
+editor_ model =
+    Element.el
+        [ Element.htmlAttribute onTextChange
+        , htmlId "editor-here"
+        , width (px 550)
+        , Background.color (Element.rgb255 0 68 85)
+        , Font.color (Element.rgb 0.85 0.85 0.85)
+        , Font.size 12
+        ]
+        (Element.html (Html.node "codemirror-editor" [] []))
+
+
+onTextChange : Html.Attribute Msg
+onTextChange =
+    textDecoder
+        |> Json.Decode.map InputText
+        |> Html.Events.on "text-change"
+
+
+textDecoder : Json.Decode.Decoder String
+textDecoder =
+    Json.Decode.string
+        |> Json.Decode.at [ "detail" ]
+
+
+
+-- END CODE MIRROR EDITOR
 
 
 searchField : Model -> Element Msg
@@ -327,35 +359,6 @@ inputFieldTemplate attr width_ default msg text =
         , label = Input.labelHidden default
         , placeholder = Just <| Input.placeholder [ Element.moveUp 5 ] (Element.text default)
         }
-
-
-editor_ : Model -> Element Msg
-editor_ model =
-    let
-        onChange : Html.Attribute Msg
-        onChange =
-            Json.Decode.string
-                |> Json.Decode.at [ "target", "editorText" ]
-                |> Json.Decode.map InputText
-                |> Html.Events.on "change"
-    in
-    el [ htmlAttribute onChange ] <|
-        html <|
-            Html.node "codemirror-editor"
-                [ HtmlAttr.attribute "theme" "twilight"
-                , HtmlAttr.attribute "wrapmode" "true"
-                , HtmlAttr.attribute "tabsize" "2"
-                , HtmlAttr.attribute "linenumber" (String.fromInt (model.linenumber + 1))
-                , HtmlAttr.attribute "softtabs" "true"
-                , HtmlAttr.attribute "navigateWithinSoftTabs" "true"
-                , HtmlAttr.attribute "fontsize" "12"
-                , HtmlAttr.style "height" (String.fromInt (innerPanelHeight model) ++ "px")
-                , HtmlAttr.style "width" (String.fromInt panelWidth_ ++ "px")
-                , HtmlAttr.attribute "text" model.sourceText
-                , HtmlAttr.attribute "searchkey" model.searchText
-                , HtmlAttr.attribute "searchcount" (String.fromInt model.searchCount)
-                ]
-                []
 
 
 green =

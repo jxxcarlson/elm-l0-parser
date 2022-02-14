@@ -1,5 +1,5 @@
 import {EditorState,basicSetup} from "@codemirror/basic-setup"
-import {javascript} from "@codemirror/lang-javascript"
+// import {javascript} from "@codemirror/lang-javascript"
 
 import {EditorView} from "@codemirror/view"
 
@@ -32,37 +32,30 @@ let myTheme = EditorView.theme({
 
 class CodemirrorEditor extends HTMLElement { // (1)
 
-        get editorText() {
-                //return the editor text
-                console.log("Called: editorText()")
-                return this.editor.state.doc.toString()
-            }
-
-        constructor(self) {
-
-            self = super(self)
-            console.log("In constructor")
-
-            return self
+    get editorText() {
+            //return the editor text
+            console.log("Called: editorText()")
+            return this.editor.state.doc.toString()
         }
+
+    constructor(self) {
+
+        self = super(self)
+        console.log("CM EDITOR: In constructor")
+
+        return self
+    }
 
 
     connectedCallback() {
 
 
-        console.log("EDITOR: In connectedCallback")
+        console.log("CM EDITOR: In connectedCallback")
 
             function sendText(editor) {
-
-                // const event = new Event('editorText', { detail: 'ABC'});
-                var text = editor.state.doc.toString()
-                var event = new Event('editorText', { 'detail': text , 'bubbles':true, 'composed': true});
-                document.dispatchEvent(event);
-                console.log("Sent event: ", event)
-                console.log("Text sent", text)
-
+                const event = new CustomEvent('text-change', { 'detail': editor.state.doc.toString() , 'bubbles':true, 'composed': true});
+                editor.dom.dispatchEvent(event);
              }
-
 
 
         let editor = new EditorView({
@@ -70,7 +63,7 @@ class CodemirrorEditor extends HTMLElement { // (1)
               extensions: [basicSetup
                 , fixedHeightEditor
                 , myTheme
-               // , EditorView.updateListener.of(update => console.log( "HOLA:" + editor.state.doc.toString()))
+                // , EditorView.updateListener.of(update => console.log( "HOLA:" + editor.state.doc.toString()))
                 , EditorView.lineWrapping
                 , EditorView.updateListener.of((v)=> {
                     if(v.docChanged) {
@@ -78,12 +71,7 @@ class CodemirrorEditor extends HTMLElement { // (1)
                     }
                   })
                 ],
-            doc: "L0 is simple markup language whose syntax is inspired by Lisp. L0 text consists of ordinary text, elements, and blocks.  L0 is simple markup language whose syntax is inspired by Lisp. L0 text consists of ordinary text, elements, and blocks.  L0 is simple markup language whose syntax is inspired by Lisp. L0 text consists of ordinary text, elements, and blocks.  L0 is simple markup language whose syntax is inspired by Lisp. L0 text consists of ordinary text, elements, and blocks."
-
-
-
-
-
+            doc: "L0 is simple markup language whose syntax is inspired by Lisp."
 
             }),
             parent: document.getElementById("editor-here")
