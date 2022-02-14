@@ -50,6 +50,7 @@ type alias Model =
     , searchText : String
     , searchCount : Int
     , selectedId : String
+    , yada : Int
     }
 
 
@@ -115,6 +116,7 @@ init flags =
       , searchText = ""
       , searchCount = 0
       , selectedId = "(none)"
+      , yada = 0
       }
     , Process.sleep 100 |> Task.perform (always IncrementCounter)
     )
@@ -194,6 +196,9 @@ update msg model =
 
                 fileName =
                     "doc.tex"
+
+                yada =
+                    model.yada + 1
             in
             ( model, Download.string fileName "application/x-latex" textToExport )
 
@@ -304,11 +309,17 @@ editor model =
         ]
 
 
+makeAttribute : String -> String -> Attribute msg
+makeAttribute name value =
+    HtmlAttr.attribute name value |> Element.htmlAttribute
+
+
 editor_ : Model -> Element Msg
 editor_ model =
     Element.el
         [ Element.htmlAttribute onTextChange
-        , HtmlAttr.attribute "text" model.sourceText |> Element.htmlAttribute
+        , makeAttribute "text" model.sourceText
+        , makeAttribute "yada" (String.fromInt model.yada)
         , htmlId "editor-here"
         , width (px 550)
         , Background.color (Element.rgb255 0 68 85)
