@@ -12,7 +12,7 @@ TESTS
 """
 
 
-text =
+text_ =
     """
 | title 
 Test Document
@@ -26,7 +26,7 @@ a[0] := 1
 """
 
 
-text_ =
+text =
     """
 | title
 L0 Technical Notes
