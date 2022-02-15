@@ -34,7 +34,15 @@ class CodemirrorEditor extends HTMLElement {
 
     static get observedAttributes() { return ['yada', 'text']; }
 
+    get editorText() {
+        //return this.textContent
+        return this.editor.getSession().getValue()
+    }
 
+    set editorText(s) {
+        console.log("Setting editor value:", s)
+        this.editor.getSession().setValue(s)
+    }
 
     constructor(self) {
 

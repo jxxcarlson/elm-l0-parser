@@ -121,8 +121,12 @@ init flags =
       , selectedId = "(none)"
       , yada = 0
       }
-    , Process.sleep 100 |> Task.perform (always IncrementCounter)
+    , Process.sleep 100 |> Task.perform (always Test)
     )
+
+
+
+-- Process.sleep 100 |> Task.perform (always (ChangeStyleSet "green"))
 
 
 renderArgs =
