@@ -1,3 +1,8 @@
+
+// https://blog.datacamp.engineering/codemirror-6-getting-started-7fd08f467ed2
+// BRACKETS: https://stackoverflow.com/questions/70758962/how-to-configure-custom-brackets-for-markdown-for-codemirror-closebrackets
+// BRACKETS: https://bl.ocks.org/curran/d8de41605fa68b627defa9906183b92f
+
 import {EditorState,basicSetup} from "@codemirror/basic-setup"
 // import {javascript} from "@codemirror/lang-javascript"
 
@@ -23,11 +28,14 @@ let myTheme = EditorView.theme({
     backgroundColor: "#045",
     color: "#ddd",
     border: "none"
-  }
+  },
+  ".cm-matching-bracket": { background: "#f70a0a" } // not working
 
 }, {dark: true})
 
 
+//.codemirror-matching-bracket { background: red; }
+//.codemirror-nonmatching-bracket { background: green; }
 
 
 class CodemirrorEditor extends HTMLElement {

@@ -39,6 +39,7 @@ main =
 
 type alias Model =
     { docLoaded : DocLoaded
+    , initialText : String
     , sourceText : String
     , ast : L0.SyntaxTree
     , editRecord : Compiler.Differential.EditRecord (Tree.Tree IntermediateBlock) (Tree.Tree ExpressionBlock) (Tree.Tree (Element L0Msg))
@@ -112,6 +113,7 @@ renderer =
 init : Flags -> ( Model, Cmd Msg )
 init flags =
     ( { docLoaded = NotLoaded
+      , initialText = ""
       , sourceText = Data.TestDoc.text
       , ast = L0.parse Data.TestDoc.text |> RenderAccumulator.transformST
       , editRecord = Compiler.Differential.init chunker parser renderer Data.TestDoc.text
@@ -212,7 +214,7 @@ update msg model =
             ( model, Download.string fileName "application/x-latex" textToExport )
 
         LoadInitialDocument ->
-            ( { model | docLoaded = DocLoaded, message = "Doc loaded" }, Cmd.none )
+            ( { model | docLoaded = DocLoaded, initialText = model.sourceText, message = "Doc loaded" }, Cmd.none )
 
         SetViewPortForElement result ->
             case result of
@@ -353,7 +355,7 @@ loadedDocument model =
             "(((empty)))"
 
         DocLoaded ->
-            model.sourceText
+            model.initialText
 
 
 onTextChange : Html.Attribute Msg
