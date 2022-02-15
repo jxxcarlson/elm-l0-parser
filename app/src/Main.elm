@@ -38,7 +38,7 @@ main =
 
 
 type alias Model =
-    { freshSourceText : String
+    { docLoaded : DocLoaded
     , sourceText : String
     , ast : L0.SyntaxTree
     , editRecord : Compiler.Differential.EditRecord (Tree.Tree IntermediateBlock) (Tree.Tree ExpressionBlock) (Tree.Tree (Element L0Msg))
@@ -53,6 +53,11 @@ type alias Model =
     , selectedId : String
     , yada : Int
     }
+
+
+type DocLoaded
+    = NotLoaded
+    | DocLoaded
 
 
 type ViewMode
@@ -106,7 +111,7 @@ renderer =
 
 init : Flags -> ( Model, Cmd Msg )
 init flags =
-    ( { freshSourceText = "Doc not loaded"
+    ( { docLoaded = NotLoaded
       , sourceText = Data.TestDoc.text
       , ast = L0.parse Data.TestDoc.text |> RenderAccumulator.transformST
       , editRecord = Compiler.Differential.init chunker parser renderer Data.TestDoc.text
@@ -207,7 +212,7 @@ update msg model =
             ( model, Download.string fileName "application/x-latex" textToExport )
 
         LoadInitialDocument ->
-            ( { model | freshSourceText = Data.TestDoc.text, message = "Doc loaded" }, Cmd.none )
+            ( { model | docLoaded = DocLoaded, message = "Doc loaded" }, Cmd.none )
 
         SetViewPortForElement result ->
             case result of
@@ -334,12 +339,21 @@ editor_ model =
         (Element.html
             (Html.node "codemirror-editor"
                 [ HtmlAttr.attribute "id" "the-codemirror-editor"
-                , HtmlAttr.attribute "text" model.freshSourceText
+                , HtmlAttr.attribute "text" (loadedDocument model)
                 , HtmlAttr.attribute "yada" (String.fromInt model.yada)
                 ]
                 []
             )
         )
+
+
+loadedDocument model =
+    case model.docLoaded of
+        NotLoaded ->
+            "(((empty)))"
+
+        DocLoaded ->
+            model.sourceText
 
 
 onTextChange : Html.Attribute Msg
