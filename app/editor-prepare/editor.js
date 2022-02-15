@@ -40,7 +40,7 @@ let myTheme = EditorView.theme({
 
 class CodemirrorEditor extends HTMLElement {
 
-    static get observedAttributes() { return ['yada', 'text']; }
+    static get observedAttributes() { return ['linenumber', 'text']; }
 
     get editorText() {
         //return this.textContent
@@ -122,39 +122,16 @@ class CodemirrorEditor extends HTMLElement {
 
             function attributeChangedCallback_(editor, attr, oldVal, newVal) {
              switch (attr) {
-                 case "yada":
-                    console.log("yada", newVal)
-//                 case "linenumber":
-//                    console.log(attr)
-//                    this.editor.scrollToLine(newVal, true, true, function () {});
-//                    this.editor.gotoLine(newVal, 0, true);
-//                    break
-//                 case "searchkey":
-//                    this.editor.$search.set({ needle: newVal });
-//                    this.editor.found = this.editor.$search.findAll(this.editor.getSession())
-//                    this.editor.searchIndex = 0
-//                    if (this.editor.found[0] != null) {
-//                            var  line =  this.editor.found[0].start.row + 1
-//                            console.log("line", line)
-//                            this.editor.scrollToLine(line, true, true, function () {});
-//                            this.editor.gotoLine(line, 0, true);
-//                      }
-//                    break
-//                 case "searchcount":
-//                    console.log("searchcount", newVal)
-//                    if (this.editor.found != null) {
-//                          this.editor.searchIndex = (this.editor.searchIndex + 1) % this.editor.found.length
-//                          var  line2 =  this.editor.found[this.editor.searchIndex].start.row + 1
-//                          console.log("line2", line2)
-//                          this.editor.scrollToLine(line2, true, true, function () {});
-//                          this.editor.gotoLine(line2, 0, true);
-//                      }
-//                    break
-//
-                     case "text":
-                           console.log("BRANCH TEXT")
-                           replaceAllText(editor, newVal)
-                           break
+
+                  case "linenumber":
+                        console.log("Line: ",newVal)
+//                        this.editor.scrollToLine(newVal, true, true, function () {});
+//                        this.editor.gotoLine(newVal, 0, true);
+                        break
+                  case "text":
+                        console.log("BRANCH TEXT")
+                        replaceAllText(editor, newVal)
+                        break
              }
          } // end attributeChangedCallback_
 

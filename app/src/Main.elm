@@ -197,8 +197,8 @@ update msg model =
                 Render.Msg.SendMeta m ->
                     ( model, Cmd.none )
 
-                Render.Msg.SendId id ->
-                    ( { model | message = "Line " ++ id }, Cmd.none )
+                Render.Msg.SendId line ->
+                    ( { model | message = "Line " ++ line, linenumber = String.toInt line |> Maybe.withDefault 0 }, Cmd.none )
 
                 _ ->
                     ( model, Cmd.none )
@@ -340,9 +340,8 @@ editor_ model =
         ]
         (Element.html
             (Html.node "codemirror-editor"
-                [ HtmlAttr.attribute "id" "the-codemirror-editor"
-                , HtmlAttr.attribute "text" (loadedDocument model)
-                , HtmlAttr.attribute "yada" (String.fromInt model.yada)
+                [ HtmlAttr.attribute "text" (loadedDocument model)
+                , HtmlAttr.attribute "linenumber" (String.fromInt model.linenumber)
                 ]
                 []
             )
