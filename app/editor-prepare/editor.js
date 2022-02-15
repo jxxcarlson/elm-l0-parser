@@ -40,7 +40,7 @@ let myTheme = EditorView.theme({
 
 class CodemirrorEditor extends HTMLElement {
 
-    static get observedAttributes() { return ['linenumber', 'text']; }
+    static get observedAttributes() { return ['selection', 'linenumber', 'text']; }
 
     get editorText() {
         //return this.textContent
@@ -124,14 +124,19 @@ class CodemirrorEditor extends HTMLElement {
              switch (attr) {
 
                   case "linenumber":
-                        console.log("Line: ",newVal)
-//                        this.editor.scrollToLine(newVal, true, true, function () {});
-//                        this.editor.gotoLine(newVal, 0, true);
+                           var lineNumber = parseInt(newVal) + 2
+                           var loc =  editor.state.doc.line(lineNumber)
+                           editor.dispatch({selection: {anchor: parseInt(loc.from)}})
+                           editor.scrollPosIntoView(loc.from)
                         break
                   case "text":
                         console.log("BRANCH TEXT")
                         replaceAllText(editor, newVal)
                         break
+
+                  case "selection":
+                      console.log("Selection", editor.state.selection.ranges)
+                      break
              }
          } // end attributeChangedCallback_
 

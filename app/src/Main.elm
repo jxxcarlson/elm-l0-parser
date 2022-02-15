@@ -89,6 +89,7 @@ type Msg
     | Render Render.Msg.L0Msg
     | SetViewPortForElement (Result Dom.Error ( Dom.Element, Dom.Viewport ))
     | LoadInitialDocument
+    | Test
 
 
 type alias Flags =
@@ -216,6 +217,9 @@ update msg model =
         LoadInitialDocument ->
             ( { model | docLoaded = DocLoaded, initialText = model.sourceText, message = "Doc loaded" }, Cmd.none )
 
+        Test ->
+            ( { model | count = model.count + 1 }, Cmd.none )
+
         SetViewPortForElement result ->
             case result of
                 Ok ( element, viewport ) ->
@@ -342,6 +346,7 @@ editor_ model =
             (Html.node "codemirror-editor"
                 [ HtmlAttr.attribute "text" (loadedDocument model)
                 , HtmlAttr.attribute "linenumber" (String.fromInt model.linenumber)
+                , HtmlAttr.attribute "selection" (String.fromInt model.count)
                 ]
                 []
             )
