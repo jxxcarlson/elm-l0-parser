@@ -72,6 +72,8 @@ class CodemirrorEditor extends HTMLElement {
                 editor.dom.dispatchEvent(event);
              }
 
+
+
            // Set up editor if need be and point this.editor to it
             if (this.editor) {
                     editor = this.editor
@@ -108,6 +110,11 @@ class CodemirrorEditor extends HTMLElement {
 
              console.log("attributeChangedCallback")
 
+             function sendSelectedText(editor, str) {
+                                         const event = new CustomEvent('selected-text', { 'detail': str , 'bubbles':true, 'composed': true});
+                                         editor.dom.dispatchEvent(event);
+                                      }
+
              function replaceAllText(editor, str) {
                          const currentValue = editor.state.doc.toString();
                          const endPosition = currentValue.length;
@@ -135,7 +142,15 @@ class CodemirrorEditor extends HTMLElement {
                         break
 
                   case "selection":
-                      console.log("Selection", editor.state.selection.ranges)
+                       var selectionFrom = editor.state.selection.ranges[0].from
+                       var selectionTo = editor.state.selection.ranges[0].to
+                       var selectionSlice = editor.state.sliceDoc(selectionFrom,selectionTo )
+                      console.log("Selection.from", selectionFrom)
+                      console.log("Selection.to", selectionTo)
+                      console.log("Selection.slice", selectionSlice)
+                      sendSelectedText(editor, selectionSlice)
+
+
                       break
              }
          } // end attributeChangedCallback_
