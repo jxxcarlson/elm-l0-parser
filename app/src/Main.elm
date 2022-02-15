@@ -82,7 +82,7 @@ type Msg
     | SetViewMode ViewMode
     | Render Render.Msg.L0Msg
     | SetViewPortForElement (Result Dom.Error ( Dom.Element, Dom.Viewport ))
-    | Test
+    | LoadInitialDocument
 
 
 type alias Flags =
@@ -106,7 +106,7 @@ renderer =
 
 init : Flags -> ( Model, Cmd Msg )
 init flags =
-    ( { freshSourceText = Data.TestDoc.text
+    ( { freshSourceText = "Doc not loaded"
       , sourceText = Data.TestDoc.text
       , ast = L0.parse Data.TestDoc.text |> RenderAccumulator.transformST
       , editRecord = Compiler.Differential.init chunker parser renderer Data.TestDoc.text
@@ -121,7 +121,7 @@ init flags =
       , selectedId = "(none)"
       , yada = 0
       }
-    , Process.sleep 100 |> Task.perform (always Test)
+    , Process.sleep 100 |> Task.perform (always LoadInitialDocument)
     )
 
 
@@ -206,8 +206,8 @@ update msg model =
             in
             ( model, Download.string fileName "application/x-latex" textToExport )
 
-        Test ->
-            ( { model | freshSourceText = model.freshSourceText ++ "\n", message = String.fromInt (model.yada + 1) }, Cmd.none )
+        LoadInitialDocument ->
+            ( { model | freshSourceText = Data.TestDoc.text, message = "Doc loaded" }, Cmd.none )
 
         SetViewPortForElement result ->
             case result of
@@ -520,7 +520,7 @@ exportLaTeXButton =
 testButton : Element Msg
 testButton =
     Input.button buttonStyle2
-        { onPress = Just Test
+        { onPress = Just LoadInitialDocument
         , label = el [ centerX, centerY, Font.size 14 ] (text "Test")
         }
 
