@@ -56,18 +56,11 @@ class CodemirrorEditor extends HTMLElement {
                 editor.dom.dispatchEvent(event);
              }
 
-         if (this.editor) {
+           // Set up editor if need be and point this.editor to it
+            if (this.editor) {
                     editor = this.editor
                 } else {
                     const options = {}
-                    // Support autoresizing
-//                    if (this.hasAttribute("max-lines")) {
-//                        options.maxLines = Number(this.getAttribute("max-lines"))
-//                    }
-//                    if (this.hasAttribute("min-lines")) {
-//                        options.minLines = Number(this.getAttribute("min-lines"))
-//                    }
-
                     let editor = new EditorView({
                                state: EditorState.create({
                                  extensions: [basicSetup
@@ -80,7 +73,7 @@ class CodemirrorEditor extends HTMLElement {
                                        }
                                      })
                                    ],
-                               doc: ""
+                               doc: "EMPTY"
 
                                }),
                                parent: document.getElementById("editor-here")
@@ -91,22 +84,7 @@ class CodemirrorEditor extends HTMLElement {
                     this.editor = editor
                     // this.editor.focus = editorFocus
 
-                    // Inject base editor styles
-                   // this.injectTheme("#ace_editor\\.css")
-
-                    // this.editor.setTheme("ace/theme/twilight");  ///
-
-//                    editor.getSession().on("change", (event) => {
-//                        element.dispatchEvent(new CustomEvent("change", { bubbles: true, composed: true, detail: event }))
-//                    })
-
                 }
-
-
-
-        console.log("THIS", this)
-
-
     }
 
 
@@ -126,9 +104,7 @@ class CodemirrorEditor extends HTMLElement {
                          })
                      }
 
-    //         if (!this._attached) {
-    //             return false
-    //         }
+            function attributeChangedCallback_(editor, attr, oldVal, newVal) {
              switch (attr) {
                  case "yada":
                     console.log("yada", newVal)
@@ -147,8 +123,6 @@ class CodemirrorEditor extends HTMLElement {
 //                            this.editor.scrollToLine(line, true, true, function () {});
 //                            this.editor.gotoLine(line, 0, true);
 //                      }
-//
-//
 //                    break
 //                 case "searchcount":
 //                    console.log("searchcount", newVal)
@@ -158,27 +132,23 @@ class CodemirrorEditor extends HTMLElement {
 //                          console.log("line2", line2)
 //                          this.editor.scrollToLine(line2, true, true, function () {});
 //                          this.editor.gotoLine(line2, 0, true);
-//
 //                      }
 //                    break
 //
                      case "text":
-                          if (this.editor) { replaceAllText(this.editor, newVal); console.log("repaced source with", newVal) }
-                          else {console.log("attr text", "this.editor not defined")}
-
-//                             console.log("SOURCE!!!:", newVal)
-//
-//                         }
-                     break
+                           console.log("BRANCH TEXT")
+                           replaceAllText(editor, newVal)
+                           break
              }
-         }
+         } // end attributeChangedCallback_
 
+         if (this.editor) { attributeChangedCallback_(this.editor, attr, oldVal, newVal)  }
+         else { console.log("attr text", "this.editor not defined")}
+
+         } // end attributeChangedCallback
 
   }
 
 customElements.define("codemirror-editor", CodemirrorEditor); // (2)
-
-
-// const currentValue = editor.state.doc.toString();
 
 

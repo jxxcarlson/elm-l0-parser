@@ -38,7 +38,8 @@ main =
 
 
 type alias Model =
-    { sourceText : String
+    { freshSourceText : String
+    , sourceText : String
     , ast : L0.SyntaxTree
     , editRecord : Compiler.Differential.EditRecord (Tree.Tree IntermediateBlock) (Tree.Tree ExpressionBlock) (Tree.Tree (Element L0Msg))
     , count : Int
@@ -105,7 +106,8 @@ renderer =
 
 init : Flags -> ( Model, Cmd Msg )
 init flags =
-    ( { sourceText = Data.TestDoc.text
+    ( { freshSourceText = Data.TestDoc.text
+      , sourceText = Data.TestDoc.text
       , ast = L0.parse Data.TestDoc.text |> RenderAccumulator.transformST
       , editRecord = Compiler.Differential.init chunker parser renderer Data.TestDoc.text
       , count = 0
@@ -201,7 +203,7 @@ update msg model =
             ( model, Download.string fileName "application/x-latex" textToExport )
 
         Test ->
-            ( { model | sourceText = model.sourceText ++ "\n", message = String.fromInt (model.yada + 1) }, Cmd.none )
+            ( { model | freshSourceText = model.freshSourceText ++ "\n", message = String.fromInt (model.yada + 1) }, Cmd.none )
 
         SetViewPortForElement result ->
             case result of
@@ -328,7 +330,7 @@ editor_ model =
         (Element.html
             (Html.node "codemirror-editor"
                 [ HtmlAttr.attribute "id" "the-codemirror-editor"
-                , HtmlAttr.attribute "text" model.sourceText
+                , HtmlAttr.attribute "text" model.freshSourceText
                 , HtmlAttr.attribute "yada" (String.fromInt model.yada)
                 ]
                 []

@@ -14,6 +14,20 @@ TESTS
 
 text =
     """
+| title 
+Test Document
+
+This is a [i real] test.
+
+$a^2 + b^2 = c^2$
+
+|| code
+a[0] := 1
+"""
+
+
+text_ =
+    """
 | title
 L0 Technical Notes
 
