@@ -281,42 +281,16 @@ firstSyncLR model searchSourceText =
 
 nextSyncLR model =
     let
-        data =
-            if model.foundIdIndex == 0 then
-                let
-                    foundIds_ =
-                        Compiler.ASTTools.matchingIdsInAST model.searchSourceText model.ast
-
-                    id_ =
-                        List.head foundIds_ |> Maybe.withDefault "(nothing)"
-                in
-                { foundIds = foundIds_
-                , foundIdIndex = 1
-                , cmd = setViewportForElement id_
-                , selectedId = id_
-                , searchCount = 0
-                }
-
-            else
-                let
-                    id_ =
-                        List.Extra.getAt model.foundIdIndex model.foundIds |> Maybe.withDefault "(nothing)"
-                in
-                { foundIds = model.foundIds
-                , foundIdIndex = modBy (List.length model.foundIds) (model.foundIdIndex + 1)
-                , cmd = setViewportForElement id_
-                , selectedId = id_
-                , searchCount = model.searchCount + 1
-                }
+        id_ =
+            List.Extra.getAt model.foundIdIndex model.foundIds |> Maybe.withDefault "(nothing)"
     in
     ( { model
-        | selectedId = data.selectedId
-        , foundIds = data.foundIds
-        , foundIdIndex = data.foundIdIndex
-        , searchCount = data.searchCount
-        , message = ("[" ++ data.selectedId ++ "]") :: data.foundIds |> String.join ", "
+        | selectedId = id_
+        , foundIdIndex = modBy (List.length model.foundIds) (model.foundIdIndex + 1)
+        , searchCount = model.searchCount + 1
+        , message = ("[" ++ id_ ++ "]") :: model.foundIds |> String.join ", "
       }
-    , data.cmd
+    , setViewportForElement id_
     )
 
 
