@@ -2,6 +2,7 @@ module Main exposing (main)
 
 import Browser
 import Browser.Dom as Dom
+import Compiler.ASTTools
 import Compiler.Acc as RenderAccumulator
 import Compiler.Differential
 import Data.TestDoc
@@ -15,6 +16,7 @@ import Html.Attributes as HtmlAttr exposing (attribute)
 import Html.Events exposing (keyCode, on, onClick, onInput)
 import Json.Decode
 import L0
+import List.Extra
 import Parser.Block exposing (ExpressionBlock, IntermediateBlock)
 import Parser.BlockUtil
 import Process
@@ -49,10 +51,15 @@ type alias Model =
     , viewMode : ViewMode
     , message : String
     , linenumber : Int
-    , searchText : String
+    , searchSourceText : String
+
+    -- SYNC
+    , foundIds : List String
+    , foundIdIndex : Int
+    , syncRequestIndex : Int
     , searchCount : Int
     , selectedId : String
-    , yada : Int
+    , doSync : Bool
     }
 
 
@@ -79,6 +86,8 @@ viewModeToString mode =
 type Msg
     = NoOp
     | InputText String
+    | SelectedText String
+    | SyncLR
     | InputSearch String
     | Search
     | ClearText
@@ -89,7 +98,7 @@ type Msg
     | Render Render.Msg.L0Msg
     | SetViewPortForElement (Result Dom.Error ( Dom.Element, Dom.Viewport ))
     | LoadInitialDocument
-    | Test
+    | StartSync
 
 
 type alias Flags =
@@ -124,10 +133,15 @@ init flags =
       , viewMode = StandardView
       , message = "0"
       , linenumber = 0
-      , searchText = ""
+      , searchSourceText = ""
+
+      -- SYNC
+      , foundIds = []
+      , foundIdIndex = 0
+      , syncRequestIndex = 0
       , searchCount = 0
       , selectedId = "(none)"
-      , yada = 0
+      , doSync = False
       }
     , Process.sleep 100 |> Task.perform (always LoadInitialDocument)
     )
@@ -160,6 +174,20 @@ update msg model =
         SetViewMode viewMode ->
             ( { model | viewMode = viewMode }, Cmd.none )
 
+        SelectedText str ->
+            firstSyncLR model str
+
+        -- ( { model | searchSourceText = str |> Debug.log "Debug (searchSourceText)", message = "selected text = " ++ str }, Cmd.none )
+        SetViewPortForElement result ->
+            case result of
+                Ok ( element, viewport ) ->
+                    ( { model | message = model.message ++ ", setting viewport" }, setViewPortForSelectedLine element viewport )
+
+                Err _ ->
+                    -- TODO: restore error message
+                    -- ( { model | message = model.message ++ ", could not set viewport" }, Cmd.none )
+                    ( model, Cmd.none )
+
         InputText str ->
             let
                 editRecord =
@@ -177,7 +205,7 @@ update msg model =
             )
 
         InputSearch str ->
-            ( { model | searchText = str }, Cmd.none )
+            ( { model | searchSourceText = str }, Cmd.none )
 
         ClearText ->
             ( { model
@@ -217,16 +245,80 @@ update msg model =
         LoadInitialDocument ->
             ( { model | docLoaded = DocLoaded, initialText = model.sourceText, message = "Doc loaded" }, Cmd.none )
 
-        Test ->
-            ( { model | count = model.count + 1 }, Cmd.none )
+        StartSync ->
+            ( { model | doSync = not model.doSync }, Cmd.none )
 
-        SetViewPortForElement result ->
-            case result of
-                Ok ( element, viewport ) ->
-                    ( model, setViewPortForSelectedLine element viewport )
+        SyncLR ->
+            ( model, Cmd.none )
 
-                Err err ->
-                    ( model, Cmd.none )
+
+firstSyncLR model searchSourceText =
+    let
+        data =
+            let
+                foundIds_ =
+                    Compiler.ASTTools.matchingIdsInAST searchSourceText model.ast
+
+                id_ =
+                    List.head foundIds_ |> Maybe.withDefault "(nothing)"
+            in
+            { foundIds = foundIds_
+            , foundIdIndex = 1
+            , cmd = setViewportForElement id_
+            , selectedId = id_
+            , searchCount = 0
+            }
+    in
+    ( { model
+        | selectedId = data.selectedId
+        , foundIds = data.foundIds
+        , foundIdIndex = data.foundIdIndex
+        , searchCount = data.searchCount
+        , message = ("[" ++ data.selectedId ++ "]") :: data.foundIds |> String.join ", "
+      }
+    , data.cmd
+    )
+
+
+syncLR model =
+    let
+        data =
+            if model.foundIdIndex == 0 then
+                let
+                    foundIds_ =
+                        Compiler.ASTTools.matchingIdsInAST model.searchSourceText model.ast
+
+                    id_ =
+                        List.head foundIds_ |> Maybe.withDefault "(nothing)"
+                in
+                { foundIds = foundIds_
+                , foundIdIndex = 1
+                , cmd = setViewportForElement id_
+                , selectedId = id_
+                , searchCount = 0
+                }
+
+            else
+                let
+                    id_ =
+                        List.Extra.getAt model.foundIdIndex model.foundIds |> Maybe.withDefault "(nothing)"
+                in
+                { foundIds = model.foundIds
+                , foundIdIndex = modBy (List.length model.foundIds) (model.foundIdIndex + 1)
+                , cmd = setViewportForElement id_
+                , selectedId = id_
+                , searchCount = model.searchCount + 1
+                }
+    in
+    ( { model
+        | selectedId = data.selectedId
+        , foundIds = data.foundIds
+        , foundIdIndex = data.foundIdIndex
+        , searchCount = data.searchCount
+        , message = ("[" ++ data.selectedId ++ "]") :: data.foundIds |> String.join ", "
+      }
+    , data.cmd
+    )
 
 
 download : String -> String -> String -> Cmd msg
@@ -284,7 +376,7 @@ mainColumn model =
                 [ row [ spacing 12 ] [ editor model, rhs model ]
                 ]
             , row [ Element.spacing 24, Element.paddingXY 8 0, Element.height (px 30), Element.width fill, Font.size 14, Background.color (Element.rgb 0.3 0.3 0.3), Font.color (Element.rgb 1 1 1) ]
-                [ exportLaTeXButton, testButton, Element.text <| "Messages: " ++ model.message ]
+                [ exportLaTeXButton, syncButton, Element.text <| "Messages: " ++ model.message ]
             ]
         ]
 
@@ -335,7 +427,8 @@ makeAttribute name value =
 editor_ : Model -> Element Msg
 editor_ model =
     Element.el
-        [ Element.htmlAttribute onTextChange
+        [ Element.htmlAttribute onSelectionChange
+        , Element.htmlAttribute onTextChange
         , htmlId "editor-here"
         , width (px 550)
         , Background.color (Element.rgb255 0 68 85)
@@ -346,11 +439,20 @@ editor_ model =
             (Html.node "codemirror-editor"
                 [ HtmlAttr.attribute "text" (loadedDocument model)
                 , HtmlAttr.attribute "linenumber" (String.fromInt model.linenumber)
-                , HtmlAttr.attribute "selection" (String.fromInt model.count)
+                , HtmlAttr.attribute "selection" (stringOfBool model.doSync)
                 ]
                 []
             )
         )
+
+
+stringOfBool bool =
+    case bool of
+        False ->
+            "false"
+
+        True ->
+            "true"
 
 
 loadedDocument model =
@@ -369,6 +471,14 @@ onTextChange =
         |> Html.Events.on "text-change"
 
 
+onSelectionChange : Html.Attribute Msg
+onSelectionChange =
+    textDecoder
+        |> Json.Decode.map SelectedText
+        |> Html.Events.on "selected-text"
+        |> Debug.log "SelectedText"
+
+
 textDecoder : Json.Decode.Decoder String
 textDecoder =
     Json.Decode.string
@@ -381,7 +491,7 @@ textDecoder =
 
 searchField : Model -> Element Msg
 searchField model =
-    inputFieldTemplate [ onEnter Search |> Element.htmlAttribute ] Element.fill "Search ..." InputSearch model.searchText
+    inputFieldTemplate [ onEnter Search |> Element.htmlAttribute ] Element.fill "Search ..." InputSearch model.searchSourceText
 
 
 onEnter : Msg -> Html.Attribute Msg
@@ -537,11 +647,11 @@ exportLaTeXButton =
         }
 
 
-testButton : Element Msg
-testButton =
+syncButton : Element Msg
+syncButton =
     Input.button buttonStyle2
-        { onPress = Just LoadInitialDocument
-        , label = el [ centerX, centerY, Font.size 14 ] (text "Test")
+        { onPress = Just StartSync
+        , label = el [ centerX, centerY, Font.size 14 ] (text "Sync")
         }
 
 

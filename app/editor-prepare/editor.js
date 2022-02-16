@@ -111,6 +111,7 @@ class CodemirrorEditor extends HTMLElement {
              console.log("attributeChangedCallback")
 
              function sendSelectedText(editor, str) {
+                                        console.log("sendSelectedText", str)
                                          const event = new CustomEvent('selected-text', { 'detail': str , 'bubbles':true, 'composed': true});
                                          editor.dom.dispatchEvent(event);
                                       }
@@ -132,12 +133,14 @@ class CodemirrorEditor extends HTMLElement {
 
                   case "linenumber":
                            var lineNumber = parseInt(newVal) + 2
+                           console.log("linenumber", lineNumber)
+
                            var loc =  editor.state.doc.line(lineNumber)
                            editor.dispatch({selection: {anchor: parseInt(loc.from)}})
                            editor.scrollPosIntoView(loc.from)
                         break
                   case "text":
-                        console.log("BRANCH TEXT")
+                        console.log("text, replaceAll")
                         replaceAllText(editor, newVal)
                         break
 
