@@ -87,7 +87,6 @@ type Msg
     = NoOp
     | InputText String
     | SelectedText String
-    | SyncLR
     | InputSearch String
     | Search
     | ClearText
@@ -99,6 +98,7 @@ type Msg
     | SetViewPortForElement (Result Dom.Error ( Dom.Element, Dom.Viewport ))
     | LoadInitialDocument
     | StartSync
+    | NextSync
 
 
 type alias Flags =
@@ -177,7 +177,6 @@ update msg model =
         SelectedText str ->
             firstSyncLR model str
 
-        -- ( { model | searchSourceText = str |> Debug.log "Debug (searchSourceText)", message = "selected text = " ++ str }, Cmd.none )
         SetViewPortForElement result ->
             case result of
                 Ok ( element, viewport ) ->
@@ -248,8 +247,8 @@ update msg model =
         StartSync ->
             ( { model | doSync = not model.doSync }, Cmd.none )
 
-        SyncLR ->
-            ( model, Cmd.none )
+        NextSync ->
+            nextSyncLR model
 
 
 firstSyncLR model searchSourceText =
@@ -280,7 +279,7 @@ firstSyncLR model searchSourceText =
     )
 
 
-syncLR model =
+nextSyncLR model =
     let
         data =
             if model.foundIdIndex == 0 then
@@ -376,7 +375,7 @@ mainColumn model =
                 [ row [ spacing 12 ] [ editor model, rhs model ]
                 ]
             , row [ Element.spacing 24, Element.paddingXY 8 0, Element.height (px 30), Element.width fill, Font.size 14, Background.color (Element.rgb 0.3 0.3 0.3), Font.color (Element.rgb 1 1 1) ]
-                [ exportLaTeXButton, syncButton, Element.text <| "Messages: " ++ model.message ]
+                [ exportLaTeXButton, syncButton, nextSyncButton model.foundIds, Element.text <| "Messages: " ++ model.message ]
             ]
         ]
 
@@ -653,6 +652,18 @@ syncButton =
         { onPress = Just StartSync
         , label = el [ centerX, centerY, Font.size 14 ] (text "Sync")
         }
+
+
+nextSyncButton : List String -> Element Msg
+nextSyncButton foundIds =
+    if List.length foundIds < 2 then
+        Element.none
+
+    else
+        Input.button buttonStyle2
+            { onPress = Just NextSync
+            , label = el [ centerX, centerY, Font.size 14 ] (text "Next sync")
+            }
 
 
 setViewMode : Model -> ViewMode -> Element Msg
