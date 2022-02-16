@@ -108,10 +108,7 @@ class CodemirrorEditor extends HTMLElement {
 
     attributeChangedCallback(attr, oldVal, newVal) {
 
-             console.log("attributeChangedCallback")
-
              function sendSelectedText(editor, str) {
-                                        console.log("sendSelectedText", str)
                                          const event = new CustomEvent('selected-text', { 'detail': str , 'bubbles':true, 'composed': true});
                                          editor.dom.dispatchEvent(event);
                                       }
@@ -133,14 +130,11 @@ class CodemirrorEditor extends HTMLElement {
 
                   case "linenumber":
                            var lineNumber = parseInt(newVal) + 2
-                           console.log("linenumber", lineNumber)
-
                            var loc =  editor.state.doc.line(lineNumber)
                            editor.dispatch({selection: {anchor: parseInt(loc.from)}})
                            editor.scrollPosIntoView(loc.from)
                         break
                   case "text":
-                        console.log("text, replaceAll")
                         replaceAllText(editor, newVal)
                         break
 
@@ -148,9 +142,6 @@ class CodemirrorEditor extends HTMLElement {
                        var selectionFrom = editor.state.selection.ranges[0].from
                        var selectionTo = editor.state.selection.ranges[0].to
                        var selectionSlice = editor.state.sliceDoc(selectionFrom,selectionTo )
-                      console.log("Selection.from", selectionFrom)
-                      console.log("Selection.to", selectionTo)
-                      console.log("Selection.slice", selectionSlice)
                       sendSelectedText(editor, selectionSlice)
 
 

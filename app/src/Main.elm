@@ -449,7 +449,6 @@ onSelectionChange =
     textDecoder
         |> Json.Decode.map SelectedText
         |> Html.Events.on "selected-text"
-        |> Debug.log "SelectedText"
 
 
 textDecoder : Json.Decode.Decoder String
@@ -537,6 +536,25 @@ wordCountElement str =
     row [ spacing 8 ] [ el [] (text <| "words:"), el [] (text <| String.fromInt <| wordCount <| str) ]
 
 
+
+-- manualCss : String -> Html msg
+
+
+manualCss : String -> Element msg
+manualCss id =
+    Html.node "style"
+        []
+        [ """
+            #{id} { background-color: yellow;}
+          """
+            |> String.replace "{id}" id
+            |> Html.text
+        ]
+        |> Element.html
+
+
+{-| Need to highlight the element with id model.selectedId
+-}
 renderedText : Model -> Element Msg
 renderedText model =
     column
@@ -547,13 +565,13 @@ renderedText model =
         , scrollbarY
         , moveUp 9
         , Font.size 14
-
-        -- , spacing 14
         , alignTop
         , htmlId "__RENDERED_TEXT__"
         , Background.color (Element.rgb255 255 255 255)
         ]
-        ((Render.TOC.view model.count Settings.defaultSettings model.ast |> Element.map Render) :: render model.ast model.count)
+        ((Render.TOC.view model.count Settings.defaultSettings model.ast |> Element.map Render)
+            :: render model.selectedId model.ast model.count
+        )
 
 
 render1 : String -> Int -> List (Element Msg)
@@ -563,9 +581,9 @@ render1 sourceText count =
         |> List.map (Element.map Render)
 
 
-render : L0.SyntaxTree -> Int -> List (Element Msg)
-render ast count =
-    Render.L0.renderFromAST count defaultSettings ast
+render : String -> L0.SyntaxTree -> Int -> List (Element Msg)
+render selectedId ast count =
+    Render.L0.renderFromAST count (settings selectedId) ast
         |> List.map (Element.map Render)
 
 
